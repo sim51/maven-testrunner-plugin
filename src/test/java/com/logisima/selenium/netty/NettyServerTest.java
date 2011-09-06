@@ -12,4 +12,5 @@ public class NettyServerTest extends TestCase {
         server.start();
         assertEquals(true, true);
     }
+
 }
