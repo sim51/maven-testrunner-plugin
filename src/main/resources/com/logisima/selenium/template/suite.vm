@@ -1,0 +1,14 @@
+<table id="suiteTable" cellpadding="1" cellspacing="1" border="1" width="100%">
+    <tbody>
+        <tr>
+            <td>
+                Maven Selenium testrunner plugin - List
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="/test.action?test=$test.path">$test.canonicalName</a>
+            </td>
+        </tr>
+    </tbody>
+</table>

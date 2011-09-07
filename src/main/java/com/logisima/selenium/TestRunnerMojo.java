@@ -8,7 +8,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.logisima.selenium.netty.NettyServer;
+import com.logisima.selenium.server.NettyServer;
+import com.logisima.selenium.utils.TestRunnerUtils;
 
 /**
  * Run all selenium test.
@@ -40,6 +41,13 @@ public class TestRunnerMojo extends AbstractMojo {
      */
     private String  outputDirectory;
 
+    /**
+     * The directory of test
+     * 
+     * @parameter expression="${project.build.testSourceDirectory }"
+     */
+    private String  testSourceDirectory;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         // we copy selenium app to target/selenium
@@ -47,7 +55,8 @@ public class TestRunnerMojo extends AbstractMojo {
         TestRunnerUtils.copySeleniumToDir(seleniumTarget);
 
         // starting selenium server.
-        NettyServer server = new NettyServer(port, outputDirectory + "selenium");
+        NettyServer server = new NettyServer(port, outputDirectory + "selenium", baseApplicationUrl,
+                testSourceDirectory, outputDirectory);
 
         // get a web client
         WebClient firefoque = TestRunnerUtils.getWebClient();

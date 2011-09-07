@@ -1,4 +1,4 @@
-package com.logisima.selenium.netty;
+package com.logisima.selenium.server;
 
 import static org.jboss.netty.handler.codec.http.HttpHeaders.is100ContinueExpected;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
@@ -7,17 +7,13 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.SET_COOKIE;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Scanner;
+import java.net.URL;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -30,7 +26,12 @@ import org.jboss.netty.handler.codec.http.CookieEncoder;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.util.CharsetUtil;
+
+import com.logisima.selenium.server.action.ListTestAction;
+import com.logisima.selenium.server.action.ServerAction;
+import com.logisima.selenium.server.action.StaticAction;
+import com.logisima.selenium.server.action.SuiteAction;
+import com.logisima.selenium.server.action.TestAction;
 
 /**
  * @author <a href="http://www.jboss.org/netty/">The Netty Project</a>
@@ -42,12 +43,17 @@ import org.jboss.netty.util.CharsetUtil;
 public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
     private HttpRequest request;
-    private boolean     readingChunks;
     private File        documentRoot;
+    private URL         baseApplicationUrl;
+    private File        testSourceDirectory;
+    private File        outputDirectory;
 
-    public HttpRequestHandler(File documentRoot) {
+    public HttpRequestHandler(File documentRoot, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
         super();
         this.documentRoot = documentRoot;
+        this.baseApplicationUrl = baseApplicationUrl;
+        this.testSourceDirectory = testSourceDirectory;
+        this.outputDirectory = outputDirectory;
     }
 
     @Override
@@ -66,54 +72,30 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
     private void writeResponse(MessageEvent e) throws IOException {
         // Decide whether to close the connection or not.
         boolean keepAlive = isKeepAlive(request);
+        ServerAction action = null;
+
+        if (request.getUri().contains(".action")) {
+            if (request.getUri().contains("list.action")) {
+                action = new ListTestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+            }
+            else if (request.getUri().contains("list.action")) {
+                action = new TestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+            }
+            else if (request.getUri().contains("suite.action")) {
+                action = new SuiteAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+            }
+        }
+        else {
+            // It's a static file
+            action = new StaticAction(request, documentRoot, baseApplicationUrl, testSourceDirectory, outputDirectory);
+        }
+
+        action.execute();
 
         // Build the response object.
-        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-
-        String responseType = "text";
-        // content-type
-        if (request.getUri().endsWith(".css")) {
-            response.setHeader(CONTENT_TYPE, "text/css; charset=utf-8");
-        }
-        else if (request.getUri().endsWith(".js")) {
-            response.setHeader(CONTENT_TYPE, "application/javascript");
-        }
-        else if (request.getUri().endsWith(".html")) {
-            response.setHeader(CONTENT_TYPE, "text/html; charset=utf-8");
-        }
-        if (request.getUri().endsWith(".txt") || request.getUri().endsWith(".log")) {
-            response.setHeader(CONTENT_TYPE, "text/plain; charset=utf-8");
-        }
-        else if (request.getUri().endsWith(".png")) {
-            response.setHeader(CONTENT_TYPE, "image/png; charset=UTF-8");
-            responseType = "file";
-        }
-        else {
-            response.setHeader(CONTENT_TYPE, "text/html; charset=UTF-8");
-        }
-
-        if (responseType.equals("text")) {
-            /** Buffer that stores the response content */
-            StringBuilder buf = new StringBuilder();
-            buf.setLength(0);
-
-            // Process the request
-            String fileName = documentRoot.getAbsolutePath() + request.getUri();
-            String NL = System.getProperty("line.separator");
-            Scanner scanner = new Scanner(new FileInputStream(fileName), "utf-8");
-            try {
-                while (scanner.hasNextLine()) {
-                    buf.append(scanner.nextLine() + NL);
-                }
-            } finally {
-                scanner.close();
-            }
-            response.setContent(ChannelBuffers.copiedBuffer(buf.toString(), CharsetUtil.UTF_8));
-        }
-        else {
-            File image = new File(documentRoot.getAbsolutePath() + request.getUri());
-            response.setContent(ChannelBuffers.copiedBuffer(FileUtils.readFileToByteArray(image)));
-        }
+        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, action.getStatus());
+        response.setHeader(CONTENT_TYPE, action.getContentType());
+        response.setContent(action.getContent());
 
         if (keepAlive) {
             // Add 'Content-Length' header only for a keep-alive connection.

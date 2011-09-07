@@ -7,6 +7,8 @@ import junit.framework.TestCase;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 
+import com.logisima.selenium.utils.TestRunnerUtils;
+
 public class TestRunnerUtilsTest extends TestCase {
 
     @Test

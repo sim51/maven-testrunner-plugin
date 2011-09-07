@@ -1,0 +1,21 @@
+#foreach( $test in $tests )
+	<table cellpadding="1" cellspacing="1" border="0" width="100%" style="margin-bottom: 20px">
+    	<thead>
+        	<tr>
+            	<th colspan="3" style="background: #111; color: #fff; padding: 5px">$test.title</th>
+        	</tr>
+    	</thead>
+    	<tbody>
+			#foreach( $command in $test.commands )        	
+              <tr>
+                <td width="33%">$command.command</td>
+                <td width="33%">$command.target</td>
+                <td width="33%">$command.value</td>
+              </tr>
+            #end
+    	</tbody>
+	</table>
+#end
+
+
+
