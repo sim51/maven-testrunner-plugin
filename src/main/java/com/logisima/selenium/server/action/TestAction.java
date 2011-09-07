@@ -4,13 +4,16 @@ import java.io.File;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -34,7 +37,11 @@ public class TestAction extends ServerAction {
         List<TestScenario> tests = SeleniumUtils.parseTestFile(testFile);
 
         // initialize velocity
-        Velocity.init();
+        Properties props = new Properties();
+        props.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+        props.setProperty("classpath." + VelocityEngine.RESOURCE_LOADER + ".class",
+                ClasspathResourceLoader.class.getName());
+        Velocity.init(props);
         VelocityContext context = new VelocityContext();
         // put parameter for template
         context.put("tests", tests);
@@ -42,7 +49,7 @@ public class TestAction extends ServerAction {
         // get the template
         Template template = null;
         try {
-            template = Velocity.getTemplate("test.vm");
+            template = Velocity.getTemplate("com/logisima/selenium/template/test.vm");
         } catch (ResourceNotFoundException rnfe) {
             this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
         } catch (ParseErrorException pee) {

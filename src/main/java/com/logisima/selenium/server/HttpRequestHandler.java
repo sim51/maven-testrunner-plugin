@@ -74,8 +74,8 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
         boolean keepAlive = isKeepAlive(request);
         ServerAction action = null;
 
-        if (request.getUri().contains(".action")) {
-            if (request.getUri().contains("list.action")) {
+        if (request.getUri().contains(".action") | request.getUri().equals("/")) {
+            if (request.getUri().contains("list.action") | request.getUri().equals("/")) {
                 action = new ListTestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
             }
             else if (request.getUri().contains("list.action")) {

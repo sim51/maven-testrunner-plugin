@@ -41,11 +41,12 @@ public class ListTestAction extends ServerAction {
         VelocityContext context = new VelocityContext();
         // put parameter for template
         context.put("tests", selenium.getTests());
+        context.put("baseApplicationUrl", baseApplicationUrl);
 
         // get the template
         Template template = null;
         try {
-            template = Velocity.getTemplate("list.vm");
+            template = Velocity.getTemplate("com/logisima/selenium/template/list.vm");
         } catch (ResourceNotFoundException rnfe) {
             this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
         } catch (ParseErrorException pee) {
