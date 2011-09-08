@@ -45,7 +45,7 @@ public class SuiteAction extends ServerAction {
         // get the template
         Template template = null;
         try {
-            template = Velocity.getTemplate("com/logisima/selenium/template/test.vm");
+            template = Velocity.getTemplate("com/logisima/selenium/template/suite.vm");
         } catch (ResourceNotFoundException rnfe) {
             this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
         } catch (ParseErrorException pee) {

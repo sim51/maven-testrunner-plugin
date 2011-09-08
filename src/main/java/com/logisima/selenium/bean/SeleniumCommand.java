@@ -22,6 +22,13 @@ public class SeleniumCommand {
     private String value;
 
     /**
+     * Constructor
+     */
+    public SeleniumCommand() {
+        super();
+    }
+
+    /**
      * Constructor.
      * 
      * @param command
@@ -42,6 +49,13 @@ public class SeleniumCommand {
     }
 
     /**
+     * @param command the command to set
+     */
+    public void setCommand(String command) {
+        this.command = command;
+    }
+
+    /**
      * @return the target
      */
     public String getTarget() {
@@ -49,10 +63,24 @@ public class SeleniumCommand {
     }
 
     /**
+     * @param target the target to set
+     */
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
+    /**
      * @return the value
      */
     public String getValue() {
         return value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 
 }

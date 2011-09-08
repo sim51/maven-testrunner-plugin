@@ -74,16 +74,14 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
         boolean keepAlive = isKeepAlive(request);
         ServerAction action = null;
 
-        if (request.getUri().contains(".action") | request.getUri().equals("/")) {
-            if (request.getUri().contains("list.action") | request.getUri().equals("/")) {
-                action = new ListTestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
-            }
-            else if (request.getUri().contains("list.action")) {
-                action = new TestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
-            }
-            else if (request.getUri().contains("suite.action")) {
-                action = new SuiteAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
-            }
+        if (request.getUri().equals("/") | request.getUri().startsWith("/list.action")) {
+            action = new ListTestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+        }
+        else if (request.getUri().startsWith("/test.action")) {
+            action = new TestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+        }
+        else if (request.getUri().startsWith("/suite.action")) {
+            action = new SuiteAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
         else {
             // It's a static file

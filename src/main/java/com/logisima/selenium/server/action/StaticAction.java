@@ -36,15 +36,11 @@ public class StaticAction extends ServerAction {
                 StringBuilder buf = new StringBuilder();
                 buf.setLength(0);
                 Scanner scanner = null;
-                try {
-                    String fileName = documentRoot.getAbsolutePath() + request.getUri();
-                    String NL = System.getProperty("line.separator");
-                    scanner = new Scanner(new FileInputStream(fileName), "utf-8");
-                    while (scanner.hasNextLine()) {
-                        buf.append(scanner.nextLine() + NL);
-                    }
-                } finally {
-                    scanner.close();
+                String fileName = documentRoot.getAbsolutePath() + request.getUri().split("[?]")[0];
+                String NL = System.getProperty("line.separator");
+                scanner = new Scanner(new FileInputStream(fileName), "utf-8");
+                while (scanner.hasNextLine()) {
+                    buf.append(scanner.nextLine() + NL);
                 }
                 this.content = ChannelBuffers.copiedBuffer(buf.toString(), CharsetUtil.UTF_8);
             }

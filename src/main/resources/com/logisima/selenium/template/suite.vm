@@ -7,7 +7,7 @@
         </tr>
         <tr>
             <td>
-                <a href="/test.action?test=$test.path">$test.canonicalName</a>
+                <a href="/test.action?test=$test.path">$test.name</a>
             </td>
         </tr>
     </tbody>

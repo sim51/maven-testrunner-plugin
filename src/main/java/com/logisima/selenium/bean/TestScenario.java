@@ -1,6 +1,5 @@
 package com.logisima.selenium.bean;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,10 +17,11 @@ public class TestScenario {
      * Constructor.
      * 
      * @param title
+     * @param commands
      */
-    public TestScenario(String title) {
+    public TestScenario(String title, List<SeleniumCommand> commands) {
         this.title = title;
-        commands = new ArrayList<SeleniumCommand>();
+        this.commands = commands;
     }
 
     /**

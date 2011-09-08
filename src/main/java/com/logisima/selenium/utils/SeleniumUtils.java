@@ -1,6 +1,7 @@
 package com.logisima.selenium.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +47,11 @@ public class SeleniumUtils {
      * 
      * @param test
      * @return
+     * @throws IOException
      */
-    public static List<TestScenario> parseTestFile(File test) {
-        return null;
+    public static List<TestScenario> parseTestFile(File test) throws IOException {
+        SeleniumParser parser = new SeleniumParser(test);
+        parser.execute();
+        return parser.getScenarios();
     }
 }

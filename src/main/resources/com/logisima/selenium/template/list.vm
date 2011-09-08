@@ -10,7 +10,7 @@
        		<ul>
        			#foreach( $test in $tests )
 				    <li>
-				    	<a href="/TestRunner.html?baseUrl=$baseApplicationUrl&test=/suite.action?test=$test.path">
+				    	<a href="/TestRunner.html?baseUrl=$baseApplicationUrl&test=/suite.action%3Ftest%3D$test.path">
 				    		$test.canonicalFile
 				    	</a>
 				    </li>
