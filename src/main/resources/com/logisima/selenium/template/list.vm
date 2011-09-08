@@ -10,8 +10,8 @@
        		<ul>
        			#foreach( $test in $tests )
 				    <li>
-				    	<a href="/TestRunner.html?baseUrl=$baseApplicationUrl&test=/suite.action%3Ftest%3D$test.path">
-				    		$test.canonicalFile
+				    	<a href="/TestRunner.html?baseUrl=$baseApplicationUrl&test=/suite.action%3Ftest%3D$stringUtils.sub($test.path, $testSourceDirectory, '')">
+				    		$stringUtils.sub($test.path, $testSourceDirectory, '')
 				    	</a>
 				    </li>
 				#end

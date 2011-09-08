@@ -13,6 +13,7 @@ import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.apache.velocity.util.StringUtils;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -41,6 +42,8 @@ public class SuiteAction extends ServerAction {
         VelocityContext context = new VelocityContext();
         // put parameter for template
         context.put("test", testFile);
+        context.put("testSourceDirectory", testSourceDirectory.getPath());
+        context.put("stringUtils", new StringUtils());
 
         // get the template
         Template template = null;

@@ -13,6 +13,7 @@ import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.apache.velocity.util.StringUtils;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -23,7 +24,7 @@ import com.logisima.selenium.utils.SeleniumUtils;
 public class ListTestAction extends ServerAction {
 
     public ListTestAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
-        super(request, baseApplicationUrl, outputDirectory, outputDirectory);
+        super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }
 
     @Override
@@ -42,6 +43,8 @@ public class ListTestAction extends ServerAction {
         // put parameter for template
         context.put("tests", selenium.getTests());
         context.put("baseApplicationUrl", baseApplicationUrl);
+        context.put("testSourceDirectory", testSourceDirectory.getPath());
+        context.put("stringUtils", new StringUtils());
 
         // get the template
         Template template = null;

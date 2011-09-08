@@ -27,7 +27,7 @@ import com.logisima.selenium.utils.SeleniumUtils;
 public class TestAction extends ServerAction {
 
     public TestAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
-        super(request, baseApplicationUrl, outputDirectory, outputDirectory);
+        super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class TestAction extends ServerAction {
         try {
             // we retrive data for the template
             String testPath = RequestUtils.getParameter(request, "test");
-            File testFile = new File(testPath);
+            File testFile = new File(testSourceDirectory + testPath);
             List<TestScenario> tests;
             tests = SeleniumUtils.parseTestFile(testFile);
 
