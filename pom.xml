@@ -1,78 +1,178 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.logisima</groupId>
-	<artifactId>testrunner-maven-plugin</artifactId>
+	
+	<!-- ====================== -->
+	<!-- = Project definition = -->
+	<!-- ====================== -->
+	<groupId>logisima</groupId>
+	<artifactId>maven-testrunner-plugin-parent</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<packaging>maven-plugin</packaging>
+	<packaging>pom</packaging>
+	<name>maven-testrunner-plugin-parent</name>
+	<description>Maven plugin to add selenium features. Plugin is java headless and don't need a selenium server</description>
+	<url>http://sim51.github.com/maven-testrunner-plugin/</url>
+	
+	<!-- =========== -->
+	<!-- = License = -->
+	<!-- =========== -->
+	<licenses>
+		<license>
+			<name>GNU General Public License</name>
+			<url>http://www.gnu.org/licenses/gpl.txt</url>
+		</license>
+	</licenses>
 
+	<!-- ======= -->
+	<!-- = SCM = -->
+	<!-- ======= -->
+	<scm>
+		<url>https://github.com/sim51/maven-testrunner-plugin/</url>
+		<connection>scm:git:git://github.com/sim51/maven-testrunner-plugin.git</connection>
+		<developerConnection>scm:git:git+ssh://git@github.com:sim51/maven-testrunner-plugin.git</developerConnection>
+	</scm>
+
+	<!-- ============== -->
+	<!-- = Bugtracker = -->
+	<!-- ============== -->
+	<issueManagement>
+		<system>Github</system>
+		<url>https://github.com/sim51/maven-testrunner-plugin/issues</url>
+	</issueManagement>
+
+	<!-- ================= -->
+	<!-- = Project owner = -->
+	<!-- ================= -->
+	<organization>
+		<name>LogiSima</name>
+		<url>http://www.logisima.com</url>
+	</organization>
+	<developers>
+		<developer>
+			<id>bsimard</id>
+			<name>Benoît SIMARD</name>
+			<email>bsimard@logisima.com</email>
+		</developer>
+	</developers>
+
+	<!-- ====================== -->
+	<!-- = Project properties = -->
+	<!-- ====================== -->
 	<properties>
 		<maven.version>2.2.1</maven.version>
+		<maven.altRepo>../logisima-maven-repository</maven.altRepo>
 	</properties>
+	
+	<!-- =========== -->
+	<!-- = Modules = -->
+	<!-- =========== -->
+	<modules>
+	    <module>maven-testrunner-plugin</module>
+	    <module>selenium-testrunner-template</module>
+	</modules>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-			<version>${maven.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-project</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-model</artifactId>
-			<version>${maven.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-settings</artifactId>
-			<version>${maven.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.netty</groupId>
-			<artifactId>netty</artifactId>
-			<version>3.2.5.Final</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jwebunit</groupId>
-			<artifactId>jwebunit-htmlunit-plugin</artifactId>
-			<version>3.0</version>
-		</dependency>
-		<dependency>
-            <groupId>org.apache.maven.shared</groupId>
-            <artifactId>maven-plugin-testing-harness</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
-		<dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-			<version>1.7</version>
-		</dependency>
-	</dependencies>
-
+	<!-- ========= -->
+	<!-- = Build = -->
+	<!-- ========= -->
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.logisima</groupId>
-				<artifactId>testrunner-maven-plugin</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
-					<baseApplicationUrl>http://thales.local/</baseApplicationUrl>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>1.5</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.scm</groupId>
+						<artifactId>maven-scm-provider-gitexe</artifactId>
+						<version>1.5</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+				    <goals>deploy</goals>
+				    <autoVersionSubmodules>true</autoVersionSubmodules>
+				    <arguments>-DaltDeploymentRepository=../logisima-maven-repository</arguments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<locales>en</locales>
+					<outputEncoding>UTF-8</outputEncoding>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-project-info-reports-plugin</artifactId>
+							<version>2.2</version>
+							<configuration>
+								<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+								<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>2.7</version>
+						</plugin>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>cobertura-maven-plugin</artifactId>
+							<version>2.5.1</version>
+						</plugin>
+					</reportPlugins>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.5.1</version>
+			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.scm</groupId>
+				<artifactId>maven-scm-provider-gitexe</artifactId>
+				<version>1.5</version>
+			</extension>
+			<extension>
+				<groupId>org.apache.maven.scm</groupId>
+				<artifactId>maven-scm-manager-plexus</artifactId>
+				<version>1.5</version>
+			</extension>
+			<extension>
+				<groupId>org.kathrynhuxtable.maven.wagon</groupId>
+				<artifactId>wagon-gitsite</artifactId>
+				<version>0.3.1</version>
+			</extension>
+		</extensions>
 	</build>
 
+	<!-- ==================== -->
+	<!-- = Maven Repository = -->
+	<!-- ==================== -->
 	<repositories>
 		<repository>
 			<id>repository.jboss.org</id>
@@ -82,4 +182,22 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	
+	<!-- =========================== -->
+	<!-- = Distribution management = -->
+	<!-- =========================== -->
+	<distributionManagement>
+		<site>
+			<id>github-site</id>
+			<url>gitsite:git@github.com/sim51/maven-testrunner-plugin.git</url>
+		</site>
+		<repository>
+			<id>logisima-releases</id>
+			<url>https://github.com/logisima/maven-repository/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>logisima-snapshots</id>
+			<url>https://github.com/logisima/maven-repository/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
