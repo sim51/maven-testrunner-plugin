@@ -1,1 +1,5 @@
-com.logisima.selenium.template
+com.logisima.selenium.utils
+com.logisima.selenium
+com.logisima.selenium.bean
+com.logisima.selenium.server.action
+com.logisima.selenium.server
