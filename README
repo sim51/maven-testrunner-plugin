@@ -1,0 +1,53 @@
+=============================================
+	Description
+=============================================
+A maven plugin that help to do selenium test.
+This module is a port of selenium testrunner of playframework. It use the same technologie, and there some code in commons..
+
+=============================================
+	Why a new Selenium plugin ?
+=============================================
+* this module is headles, so it can be run on a server 
+* this module embended the testrunner selenium server
+* you can test your selenium script directly on your develoment plateforme (no need of selenium server)
+
+=============================================
+	How to use it ?
+=============================================
+* Add this repository into your pom.xml :
+	<repository>
+		<id>logisima-releases</id>
+		<url>https://github.com/logisima/maven-repository/releases</url>
+	</repository>
+
+* Add this to your build phase into your pom.xml
+	<plugin>
+		<groupId>logisima</groupId>
+		<artifactId>maven-testrunner-plugin</artifactId>
+		<version>1.0</version>
+		<configuration>
+			<baseApplicationUrl>http://localhost:8080/monApp</baseApplicationUrl>	
+		</configuration>
+	</plugin>
+Where "http://localhost:8080/monApp" is the url of your application to test. 
+ 
+* Create your selenium script using the same syntax as play! (@see http://www.playframework.org/documentation/1.2.3/cheatsheet/tests) :
+    - your selenium script must have name like *.test.html
+
+* then you can use this two command :
+    - mvn testrunner:run : lauch the testrunner server (by default port is 7777), so if you open your browser at http://localhost:7777/ you will see the list of yours selenium script and run it.
+    - mvn testrunner:auto-run : lauch in command line all your selenium, and if one failed, the build failed !
+
+==============================================
+	Plugin configuration
+==============================================
+* baseApplicationUrl : the url of the application to test.
+* port : the port of the selenium server that the plugin start (default: 7777)
+
+Moreover, the plugin is base on the following maven variable :
+* ${project.build.directory}
+* ${project.build.testSourceDirectory}
+D
+D
+D
+* outputDirectory ( 
