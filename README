@@ -47,7 +47,3 @@ Where "http://localhost:8080/monApp" is the url of your application to test.
 Moreover, the plugin is base on the following maven variable :
 * ${project.build.directory}
 * ${project.build.testSourceDirectory}
-D
-D
-D
-* outputDirectory ( 
