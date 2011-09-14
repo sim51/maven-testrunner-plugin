@@ -19,12 +19,10 @@
  */
 package com.logisima.selenium.utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -92,23 +90,10 @@ public class SeleniumUtils {
     }
 
     public static void writeContent(CharSequence content, File file) throws IOException {
-        OutputStream os = null;
-        try {
-            os = new FileOutputStream(file);
-            PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(os, "utf-8"));
-            printWriter.println(content);
-            printWriter.flush();
-            os.flush();
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            try {
-                if (os != null)
-                    os.close();
-            } catch (Exception e) {
-                //
-            }
-        }
+        FileWriter fstream = new FileWriter(file.getPath());
+        BufferedWriter out = new BufferedWriter(fstream);
+        out.write(content.toString());
+        out.close();
     }
 
 }

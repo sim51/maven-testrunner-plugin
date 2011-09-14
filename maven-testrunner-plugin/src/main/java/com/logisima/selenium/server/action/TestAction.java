@@ -33,6 +33,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -61,6 +62,9 @@ public class TestAction extends ServerAction {
             // initialize velocity
             Properties props = new Properties();
             props.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+            props.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                    "org.apache.velocity.runtime.log.Log4JLogChute");
+            props.setProperty("runtime.log.logsystem.log4j.logger", "VELOCITY");
             props.setProperty("classpath." + VelocityEngine.RESOURCE_LOADER + ".class",
                     ClasspathResourceLoader.class.getName());
             Velocity.init(props);

@@ -70,14 +70,6 @@ public class TestRunnerMojo extends AbstractMojo {
      */
     private String  testSourceDirectory;
 
-    /**
-     * Decides whether to wait after the server is started or to return the execution flow to the user.
-     * 
-     * @parameter default-value = "true"
-     * @required
-     */
-    private boolean wait;
-
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         // we copy selenium app to target/selenium

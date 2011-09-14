@@ -17,32 +17,29 @@
  *  @author Benoît Simard
  *  @See https://github.com/sim51/maven-testrunner-plugin
  */
-package com.logisima.selenium.utils;
+package com.logisima.selenium;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 
-import junit.framework.TestCase;
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.junit.Test;
+public class AutoTestRunnerMojoTest extends AbstractMojoTestCase {
 
-import com.gargoylesoftware.htmlunit.WebClient;
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
+    protected void setUp() throws Exception {
 
-public class TestRunnerUtilsTest extends TestCase {
-
-    @Test
-    public void testCopySelenium() throws MojoExecutionException {
-        File seleniumTarget = new File(FileUtils.getTempDirectoryPath() + "/selenium");
-        TestRunnerUtils.copySeleniumToDir(seleniumTarget);
+        // required for mojo lookups to work
+        super.setUp();
     }
 
-    @Test
-    public void testWebClient() throws MalformedURLException {
-        WebClient firephoque = TestRunnerUtils.getWebClient();
-        URL url = new URL("http://www.google.fr");
-        firephoque.openWindow(url, "headless");
+    /**
+     * @throws Exception
+     */
+    public void testMojoGoal() throws Exception {
+        File testPom = new File(getBasedir(), "src/test/resources/pom.xml");
+        AutoTestRunnerMojo mojo = (AutoTestRunnerMojo) lookupMojo("auto-run", testPom);
+        assertNotNull(mojo);
     }
 }

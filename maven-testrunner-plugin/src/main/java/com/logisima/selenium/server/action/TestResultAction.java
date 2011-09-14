@@ -33,6 +33,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -41,6 +42,7 @@ import org.jboss.netty.util.CharsetUtil;
 
 import com.logisima.selenium.utils.RequestUtils;
 import com.logisima.selenium.utils.SeleniumUtils;
+import com.logisima.selenium.utils.TestRunnerUtils;
 
 public class TestResultAction extends ServerAction {
 
@@ -58,13 +60,18 @@ public class TestResultAction extends ServerAction {
             String result = parameters.get("result");
 
             File directoryResult = new File(outputDirectory + "/selenium-result/");
-            directoryResult.mkdirs();
-            File resultFile = new File(outputDirectory + "/selenium-result/" + test.replace("/", ".") + "." + result
-                    + ".html");
+            if (!directoryResult.exists()) {
+                directoryResult.mkdirs();
+            }
+            File resultFile = new File(outputDirectory + "/selenium-result/" + TestRunnerUtils.getResultFileName(test)
+                    + "." + result + ".html");
 
             // initialize velocity
             Properties props = new Properties();
             props.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+            props.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                    "org.apache.velocity.runtime.log.Log4JLogChute");
+            props.setProperty("runtime.log.logsystem.log4j.logger", "VELOCITY");
             props.setProperty("classpath." + VelocityEngine.RESOURCE_LOADER + ".class",
                     ClasspathResourceLoader.class.getName());
             Velocity.init(props);

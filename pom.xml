@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<!-- ====================== -->
 	<!-- = Project definition = -->
 	<!-- ====================== -->
@@ -12,7 +12,7 @@
 	<name>maven-testrunner-plugin-parent</name>
 	<description>Maven plugin to add selenium features. Plugin is java headless and don't need a selenium server</description>
 	<url>http://sim51.github.com/maven-testrunner-plugin/</url>
-	
+
 	<!-- =========== -->
 	<!-- = License = -->
 	<!-- =========== -->
@@ -62,13 +62,13 @@
 		<maven.version>2.2.1</maven.version>
 		<maven.altRepo>../logisima-maven-repository</maven.altRepo>
 	</properties>
-	
+
 	<!-- =========== -->
 	<!-- = Modules = -->
 	<!-- =========== -->
 	<modules>
-	    <module>maven-testrunner-plugin</module>
-	    <module>selenium-testrunner-template</module>
+		<module>maven-testrunner-plugin</module>
+		<module>selenium-testrunner-template</module>
 	</modules>
 
 	<!-- ========= -->
@@ -102,9 +102,9 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.2.1</version>
 				<configuration>
-				    <goals>deploy</goals>
-				    <autoVersionSubmodules>true</autoVersionSubmodules>
-				    <arguments>-DaltDeploymentRepository=../logisima-maven-repository</arguments>
+					<goals>deploy</goals>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<arguments>-DaltDeploymentRepository=../logisima-maven-repository</arguments>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -152,7 +152,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	
+
 	<!-- =========================== -->
 	<!-- = Distribution management = -->
 	<!-- =========================== -->

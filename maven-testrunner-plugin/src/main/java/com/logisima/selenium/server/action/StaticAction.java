@@ -65,8 +65,10 @@ public class StaticAction extends ServerAction {
             }
         } catch (FileNotFoundException e) {
             this.status = HttpResponseStatus.NOT_FOUND;
+            this.content = ChannelBuffers.copiedBuffer(e.toString(), CharsetUtil.UTF_8);
         } catch (IOException e) {
             this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+            this.content = ChannelBuffers.copiedBuffer(e.toString(), CharsetUtil.UTF_8);
         }
     }
 

@@ -37,6 +37,7 @@ import com.gargoylesoftware.htmlunit.ConfirmHandler;
 import com.gargoylesoftware.htmlunit.DefaultPageCreator;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.PromptHandler;
+import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.WebWindow;
@@ -135,6 +136,10 @@ public class TestRunnerUtils {
      */
     public static WebClient getWebClient() {
         WebClient firephoque = new WebClient(BrowserVersion.INTERNET_EXPLORER_8);
+
+        // silent mode
+        firephoque.setCssErrorHandler(new SilentCssErrorHandler());
+
         firephoque.setPageCreator(new DefaultPageCreator() {
 
             @Override
@@ -192,6 +197,10 @@ public class TestRunnerUtils {
         });
         firephoque.setThrowExceptionOnScriptError(false);
         return firephoque;
+    }
+
+    public static String getResultFileName(String file) {
+        return file.replace("/", ".").replaceFirst(".", "");
     }
 
 }
