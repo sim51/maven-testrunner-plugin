@@ -28,7 +28,7 @@
 	<scm>
 		<url>https://github.com/sim51/maven-testrunner-plugin/</url>
 		<connection>scm:git:git://github.com/sim51/maven-testrunner-plugin.git</connection>
-		<developerConnection>scm:git:git+ssh://git@github.com:sim51/maven-testrunner-plugin.git</developerConnection>
+		<developerConnection>scm:git:git+ssh://git@github.com/sim51/maven-testrunner-plugin.git</developerConnection>
 	</scm>
 
 	<!-- ============== -->
