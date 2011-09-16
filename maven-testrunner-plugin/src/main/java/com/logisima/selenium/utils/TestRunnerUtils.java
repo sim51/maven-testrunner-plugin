@@ -42,8 +42,13 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.WebWindow;
 import com.gargoylesoftware.htmlunit.javascript.host.Window;
-import com.logisima.selenium.template.SeleniumTestRunnerTemplate;
 
+/**
+ * Utils class for the testrunner application (or related to).
+ * 
+ * @author bsimard
+ * 
+ */
 public class TestRunnerUtils {
 
     /**
@@ -199,6 +204,12 @@ public class TestRunnerUtils {
         return firephoque;
     }
 
+    /**
+     * Return the the display name of selenium script (by its path)
+     * 
+     * @param file
+     * @return
+     */
     public static String getResultFileName(String file) {
         return file.replace("/", ".").replaceFirst(".", "");
     }

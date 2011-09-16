@@ -70,6 +70,9 @@ public class TestRunnerMojo extends AbstractMojo {
      */
     private String  testSourceDirectory;
 
+    /**
+     * Execute method of the Mojo.
+     */
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         // we copy selenium app to target/selenium

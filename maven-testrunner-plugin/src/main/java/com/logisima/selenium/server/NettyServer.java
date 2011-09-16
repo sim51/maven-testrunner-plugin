@@ -25,19 +25,55 @@ import java.net.URL;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
+/**
+ * Class to create and maange an netty server.
+ * 
+ * @author bsimard
+ * 
+ */
 public class NettyServer extends Thread {
 
+    /**
+     * port of the server.
+     */
     private Integer         port;
-    private Channel         channel;
+
+    /**
+     * Bootsrap instance of the running server
+     */
     private ServerBootstrap bootstrap;
+
+    /**
+     * DocumentRoot of the server.
+     */
     private File            documentRoot;
+
+    /**
+     * Url of the application to test
+     */
     private URL             baseApplicationUrl;
+
+    /**
+     * Maven test folder
+     */
     private File            testSourceDirectory;
+
+    /**
+     * Maven target folder
+     */
     private File            outputDirectory;
 
+    /**
+     * Constructor.
+     * 
+     * @param port
+     * @param documentRoot
+     * @param baseApplicationUrl
+     * @param testSourceDirectory
+     * @param outputDirectory
+     */
     public NettyServer(Integer port, String documentRoot, URL baseApplicationUrl, String testSourceDirectory,
             String outputDirectory) {
         super();
@@ -48,6 +84,9 @@ public class NettyServer extends Thread {
         this.outputDirectory = new File(outputDirectory);
     }
 
+    /**
+     * Method to run the server.
+     */
     public void run() {
         // create the boostrap server
         this.bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),
@@ -65,7 +104,7 @@ public class NettyServer extends Thread {
         bootstrap.setOption("readWriteFair", true);
 
         // Bind and start to accept incoming connections.
-        this.channel = this.bootstrap.bind(new InetSocketAddress(port));
+        this.bootstrap.bind(new InetSocketAddress(port));
     }
 
 }

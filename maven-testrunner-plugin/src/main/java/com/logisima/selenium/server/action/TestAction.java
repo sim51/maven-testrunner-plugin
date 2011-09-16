@@ -44,8 +44,22 @@ import com.logisima.selenium.bean.TestScenario;
 import com.logisima.selenium.utils.RequestUtils;
 import com.logisima.selenium.utils.SeleniumUtils;
 
+/**
+ * Server action to generate the selenium test file.
+ * 
+ * @author bsimard
+ * 
+ */
 public class TestAction extends ServerAction {
 
+    /**
+     * Constructor.
+     * 
+     * @param request
+     * @param baseApplicationUrl
+     * @param testSourceDirectory
+     * @param outputDirectory
+     */
     public TestAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
         super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }

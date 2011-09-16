@@ -32,10 +32,28 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
 
+/**
+ * Server action to serve static file.
+ * 
+ * @author bsimard
+ * 
+ */
 public class StaticAction extends ServerAction {
 
+    /**
+     * The documentRoot folder of the server.
+     */
     private File documentRoot;
 
+    /**
+     * Constructor.
+     * 
+     * @param request
+     * @param documentRoot
+     * @param baseApplicationUrl
+     * @param testSourceDirectory
+     * @param outputDirectory
+     */
     public StaticAction(HttpRequest request, File documentRoot, URL baseApplicationUrl, File testSourceDirectory,
             File outputDirectory) {
         super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
@@ -72,6 +90,9 @@ public class StaticAction extends ServerAction {
         }
     }
 
+    /**
+     * Method to set the content-type of the response.
+     */
     private void setContentType() {
         // content-type
         if (request.getUri().endsWith(".css")) {

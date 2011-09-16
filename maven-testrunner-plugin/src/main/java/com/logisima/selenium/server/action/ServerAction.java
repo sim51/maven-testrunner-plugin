@@ -26,6 +26,12 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
+/**
+ * Abstract class to make a server action.
+ * 
+ * @author bsimard
+ * 
+ */
 public abstract class ServerAction {
 
     protected String             contentType;
@@ -49,6 +55,9 @@ public abstract class ServerAction {
         this.outputDirectory = outputDirectory;
     }
 
+    /**
+     * Perform the action !
+     */
     public abstract void execute();
 
     /**

@@ -29,6 +29,12 @@ import java.util.List;
 import com.logisima.selenium.bean.SeleniumCommand;
 import com.logisima.selenium.bean.TestScenario;
 
+/**
+ * Parser for "play!" selenium script.
+ * 
+ * @author bsimard
+ * 
+ */
 public class SeleniumParser {
 
     /**

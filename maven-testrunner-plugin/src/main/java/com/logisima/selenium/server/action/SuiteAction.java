@@ -41,8 +41,22 @@ import org.jboss.netty.util.CharsetUtil;
 
 import com.logisima.selenium.utils.RequestUtils;
 
+/**
+ * Server action to generate the suite file for selenium testrunner.
+ * 
+ * @author bsimard
+ * 
+ */
 public class SuiteAction extends ServerAction {
 
+    /**
+     * Constructor.
+     * 
+     * @param request
+     * @param baseApplicationUrl
+     * @param testSourceDirectory
+     * @param outputDirectory
+     */
     public SuiteAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
         super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }

@@ -19,23 +19,40 @@
  */
 package com.logisima.selenium.server;
 
-import com.logisima.selenium.TestRunnerMojo;
+import org.apache.maven.plugin.AbstractMojo;
 
+/**
+ * 
+ * @author bsimard
+ * 
+ */
 public class NettyServerScanner extends Thread {
 
-    private final TestRunnerMojo mojo;
-    private final int            port;
+    /**
+     * The mojo that call this class (to get the logger)
+     */
+    private final AbstractMojo mojo;
 
     /**
+     * port of the server
+     */
+    private final int          port;
+
+    /**
+     * Constructor.
+     * 
      * @param mojo
      * @param port
      */
-    public NettyServerScanner(TestRunnerMojo mojo, int port) {
+    public NettyServerScanner(AbstractMojo mojo, int port) {
         super();
         this.mojo = mojo;
         this.port = port;
     }
 
+    /**
+     * Run method of the thread.
+     */
     public void run() {
         while (true) {
             // TODO: check if the server is UP
@@ -43,6 +60,9 @@ public class NettyServerScanner extends Thread {
         }
     }
 
+    /**
+     * Get some sleep for the thread ...
+     */
     private void getSomeSleep() {
         try {
             Thread.sleep(500);

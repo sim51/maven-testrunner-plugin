@@ -41,8 +41,22 @@ import org.jboss.netty.util.CharsetUtil;
 
 import com.logisima.selenium.utils.SeleniumUtils;
 
+/**
+ * Server action to list all selenium test of the project.
+ * 
+ * @author bsimard
+ * 
+ */
 public class ListTestAction extends ServerAction {
 
+    /**
+     * Constructor.
+     * 
+     * @param request
+     * @param baseApplicationUrl
+     * @param testSourceDirectory
+     * @param outputDirectory
+     */
     public ListTestAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
         super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }

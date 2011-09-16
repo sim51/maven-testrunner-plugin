@@ -23,15 +23,12 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.is100ContinueExpect
 import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
-import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
-import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.SET_COOKIE;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Set;
 
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
@@ -39,9 +36,6 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.handler.codec.http.Cookie;
-import org.jboss.netty.handler.codec.http.CookieDecoder;
-import org.jboss.netty.handler.codec.http.CookieEncoder;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
@@ -55,12 +49,39 @@ import com.logisima.selenium.server.action.TestResultAction;
 
 public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
+    /**
+     * The request
+     */
     private HttpRequest request;
+
+    /**
+     * Document of the server
+     */
     private File        documentRoot;
+
+    /**
+     * The url of the application to test
+     */
     private URL         baseApplicationUrl;
+
+    /**
+     * Directory of test source
+     */
     private File        testSourceDirectory;
+
+    /**
+     * maven target directory
+     */
     private File        outputDirectory;
 
+    /**
+     * The constructor.
+     * 
+     * @param documentRoot
+     * @param baseApplicationUrl
+     * @param testSourceDirectory
+     * @param outputDirectory
+     */
     public HttpRequestHandler(File documentRoot, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
         super();
         this.documentRoot = documentRoot;
@@ -82,20 +103,30 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
     }
 
+    /**
+     * Method that generate the serveur response.
+     * 
+     * @param e
+     * @throws IOException
+     */
     private void writeResponse(MessageEvent e) throws IOException {
         // Decide whether to close the connection or not.
         boolean keepAlive = isKeepAlive(request);
         ServerAction action = null;
 
-        if (request.getUri().equals("/") | request.getUri().startsWith("/list.action")) {
+        // The default action, list all selenium test
+        if (request.getUri().equals("/")) {
             action = new ListTestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
-        else if (request.getUri().startsWith("/test.action")) {
+        // action that generate the selenium script
+        else if (request.getUri().startsWith("/test/")) {
             action = new TestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
-        else if (request.getUri().startsWith("/suite.action")) {
+        // action that generate the suite file for the testrunner
+        else if (request.getUri().startsWith("/suite")) {
             action = new SuiteAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
+        // action that generate the result file
         else if (request.getUri().startsWith("/testresult/")) {
             action = new TestResultAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
@@ -114,21 +145,6 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
         if (keepAlive) {
             // Add 'Content-Length' header only for a keep-alive connection.
             response.setHeader(CONTENT_LENGTH, response.getContent().readableBytes());
-        }
-
-        // Encode the cookie.
-        String cookieString = request.getHeader(COOKIE);
-        if (cookieString != null) {
-            CookieDecoder cookieDecoder = new CookieDecoder();
-            Set<Cookie> cookies = cookieDecoder.decode(cookieString);
-            if (!cookies.isEmpty()) {
-                // Reset the cookies if necessary.
-                CookieEncoder cookieEncoder = new CookieEncoder(true);
-                for (Cookie cookie : cookies) {
-                    cookieEncoder.addCookie(cookie);
-                }
-                response.addHeader(SET_COOKIE, cookieEncoder.encode());
-            }
         }
 
         // Write the response.

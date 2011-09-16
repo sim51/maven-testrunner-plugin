@@ -31,8 +31,21 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.util.CharsetUtil;
 
+/**
+ * Utils class to get information from a request.
+ * 
+ * @author bsimard
+ * 
+ */
 public class RequestUtils {
 
+    /**
+     * Retrive a GET parameter from the request.
+     * 
+     * @param request
+     * @param param
+     * @return the value of the parameter, <code>null</code> if <code>param</code> does'nt exist.
+     */
     public static String getParameter(HttpRequest request, String param) {
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
         Map<String, List<String>> params = queryStringDecoder.getParameters();
@@ -50,6 +63,13 @@ public class RequestUtils {
         return null;
     }
 
+    /**
+     * Return all POST param of a request.
+     * 
+     * @param request
+     * @return
+     * @throws UnsupportedEncodingException
+     */
     public static Map<String, String> getPostParameters(HttpRequest request) throws UnsupportedEncodingException {
         Map<String, String> postArgs = new HashMap<String, String>();
         ChannelBuffer cbContent = request.getContent();

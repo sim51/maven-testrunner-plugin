@@ -44,8 +44,22 @@ import com.logisima.selenium.utils.RequestUtils;
 import com.logisima.selenium.utils.SeleniumUtils;
 import com.logisima.selenium.utils.TestRunnerUtils;
 
+/**
+ * Server action to generate the result file of a test.
+ * 
+ * @author bsimard
+ * 
+ */
 public class TestResultAction extends ServerAction {
 
+    /**
+     * Constructor.
+     * 
+     * @param request
+     * @param baseApplicationUrl
+     * @param testSourceDirectory
+     * @param outputDirectory
+     */
     public TestResultAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
         super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }

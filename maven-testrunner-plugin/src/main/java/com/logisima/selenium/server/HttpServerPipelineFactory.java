@@ -32,11 +32,34 @@ import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 
 public class HttpServerPipelineFactory implements ChannelPipelineFactory {
 
+    /**
+     * DocumentRoot of the server
+     */
     private File documentRoot;
+
+    /**
+     * Url of the applicatoin to test
+     */
     private URL  baseApplicationUrl;
+
+    /**
+     * Maven test directory
+     */
     private File testSourceDirectory;
+
+    /**
+     * Maven target folder
+     */
     private File outputDirectory;
 
+    /**
+     * Constructor.
+     * 
+     * @param documentRoot
+     * @param baseApplicationUrl
+     * @param testSourceDirectory
+     * @param outputDirectory
+     */
     public HttpServerPipelineFactory(File documentRoot, URL baseApplicationUrl, File testSourceDirectory,
             File outputDirectory) {
         this.documentRoot = documentRoot;
@@ -49,14 +72,8 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory {
 
         // Create a default pipeline implementation.
         ChannelPipeline pipeline = pipeline();
-
         pipeline.addLast("decoder", new HttpRequestDecoder());
-
-        // Uncomment the following line if you don't want to handle HttpChunks.
-        // pipeline.addLast("aggregator", new HttpChunkAggregator(1048576));
         pipeline.addLast("encoder", new HttpResponseEncoder());
-
-        // Remove the following line if you don't want automatic content compression.
         pipeline.addLast("deflater", new HttpContentCompressor());
         pipeline.addLast("handler", new HttpRequestHandler(documentRoot, baseApplicationUrl, testSourceDirectory,
                 outputDirectory));
