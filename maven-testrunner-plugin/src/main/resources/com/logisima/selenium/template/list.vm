@@ -10,8 +10,8 @@
        		<ul>
        			#foreach( $test in $tests )
 				    <li>
-				    	<a href="/TestRunner.html?baseUrl=$baseApplicationUrl&auto=true&test=/suite.action%3Ftest%3D$stringUtils.sub($test.path, $testSourceDirectory, '')&resultsUrl=/testresult/$stringUtils.sub($test.path, $testSourceDirectory, '')">
-				    		$stringUtils.sub($test.path, $testSourceDirectory, '')
+				    	<a href="$TRUtils.getTestrunnerActionUrl($test, $baseApplicationUrl, $testSourceDirectory)">
+				    		$TRUtils.getTestDisplayName($test, $testSourceDirectory)
 				    	</a>
 				    </li>
 				#end

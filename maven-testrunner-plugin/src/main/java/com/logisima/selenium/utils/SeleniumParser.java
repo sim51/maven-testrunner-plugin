@@ -113,12 +113,22 @@ public class SeleniumParser {
                     String[] tempTab = temp.split("'[\\s]*,[\\s]*'");
 
                     // find target
-                    String target;
-                    if (tempTab.length == 1) {
-                        target = temp.replaceAll("'", "");
-                    }
-                    else {
-                        target = tempTab[0].trim().substring(1);
+                    String target = "";
+                    if (temp.length() > 1) {
+
+                        // if it's only a target
+                        if (tempTab.length == 1) {
+                            // is it a numeric value
+                            if (temp.contains("'")) {
+                                target = temp.substring(1, temp.length() - 1);
+                            }
+                            else {
+                                target = temp;
+                            }
+                        }
+                        else {
+                            target = tempTab[0].trim().substring(1);
+                        }
                     }
                     command.setTarget(target);
 

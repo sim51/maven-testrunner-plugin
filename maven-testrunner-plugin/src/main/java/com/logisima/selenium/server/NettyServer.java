@@ -25,6 +25,8 @@ import java.net.URL;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 /**
@@ -44,6 +46,7 @@ public class NettyServer extends Thread {
      * Bootsrap instance of the running server
      */
     private ServerBootstrap bootstrap;
+    private Channel         channel;
 
     /**
      * DocumentRoot of the server.
@@ -104,7 +107,14 @@ public class NettyServer extends Thread {
         bootstrap.setOption("readWriteFair", true);
 
         // Bind and start to accept incoming connections.
-        this.bootstrap.bind(new InetSocketAddress(port));
+        channel = bootstrap.bind(new InetSocketAddress(port));
     }
 
+    public void shutdown() {
+        ChannelFuture cFuture = channel.close();
+        cFuture.awaitUninterruptibly();
+        cFuture.getChannel().getCloseFuture().awaitUninterruptibly();
+        bootstrap.getFactory().releaseExternalResources();
+        this.interrupt();
+    }
 }

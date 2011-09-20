@@ -33,13 +33,12 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.apache.velocity.util.StringUtils;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
 
-import com.logisima.selenium.utils.RequestUtils;
+import com.logisima.selenium.utils.TestRunnerUtils;
 
 /**
  * Server action to generate the suite file for selenium testrunner.
@@ -64,8 +63,8 @@ public class SuiteAction extends ServerAction {
     @Override
     public void execute() {
         // we retrive data for the template
-        String testPath = RequestUtils.getParameter(request, "test");
-        File testFile = new File(testPath);
+        String testPath = request.getUri().replaceFirst("/suite", "");
+        File testFile = new File(testSourceDirectory + testPath.split("[?]")[0]);
 
         // initialize velocity
         Properties props = new Properties();
@@ -79,7 +78,7 @@ public class SuiteAction extends ServerAction {
         // put parameter for template
         context.put("test", testFile);
         context.put("testSourceDirectory", testSourceDirectory.getPath());
-        context.put("stringUtils", new StringUtils());
+        context.put("TRUtils", new TestRunnerUtils());
 
         // get the template
         Template template = null;

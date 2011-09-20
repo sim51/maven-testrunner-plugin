@@ -94,11 +94,12 @@ public class TestRunnerMojo extends AbstractMojo {
         scanner.start();
         try {
             while (scanner.isAlive()) {
-                Thread.currentThread().sleep(100);
+                Thread.sleep(100);
             }
         } catch (InterruptedException e) {
             throw new MojoExecutionException(e.getMessage());
+        } finally {
+            server.shutdown();
         }
-
     }
 }

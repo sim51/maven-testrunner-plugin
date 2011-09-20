@@ -33,13 +33,13 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.apache.velocity.util.StringUtils;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
 
-import com.logisima.selenium.utils.SeleniumUtils;
+import com.logisima.selenium.utils.SeleniumScanner;
+import com.logisima.selenium.utils.TestRunnerUtils;
 
 /**
  * Server action to list all selenium test of the project.
@@ -64,8 +64,8 @@ public class ListTestAction extends ServerAction {
     @Override
     public void execute() {
         // get list of selenium test
-        SeleniumUtils selenium = new SeleniumUtils();
-        selenium.scanForSeleniumTests(testSourceDirectory);
+        SeleniumScanner scanner = new SeleniumScanner();
+        scanner.scanForSeleniumTests(testSourceDirectory);
 
         // initialize velocity
         Properties props = new Properties();
@@ -77,10 +77,10 @@ public class ListTestAction extends ServerAction {
         Velocity.init(props);
         VelocityContext context = new VelocityContext();
         // put parameter for template
-        context.put("tests", selenium.getTests());
+        context.put("tests", scanner.getTests());
         context.put("baseApplicationUrl", baseApplicationUrl);
         context.put("testSourceDirectory", testSourceDirectory.getPath());
-        context.put("stringUtils", new StringUtils());
+        context.put("TRUtils", new TestRunnerUtils());
 
         // get the template
         Template template = null;

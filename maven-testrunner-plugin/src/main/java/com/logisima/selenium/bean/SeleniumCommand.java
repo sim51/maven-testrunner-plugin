@@ -61,6 +61,27 @@ public class SeleniumCommand {
     }
 
     /**
+     * @param command
+     * @param value
+     */
+    public SeleniumCommand(String command, String target) {
+        super();
+        this.command = command;
+        this.value = "";
+        this.target = target;
+    }
+
+    /**
+     * @param command
+     */
+    public SeleniumCommand(String command) {
+        super();
+        this.command = command;
+        this.target = "";
+        this.value = "";
+    }
+
+    /**
      * @return the command
      */
     public String getCommand() {

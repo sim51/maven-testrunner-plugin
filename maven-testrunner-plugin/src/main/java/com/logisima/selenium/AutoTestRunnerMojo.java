@@ -27,11 +27,10 @@ import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.velocity.util.StringUtils;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.logisima.selenium.server.NettyServer;
-import com.logisima.selenium.utils.SeleniumUtils;
+import com.logisima.selenium.utils.SeleniumScanner;
 import com.logisima.selenium.utils.TestRunnerUtils;
 
 /**
@@ -93,22 +92,22 @@ public class AutoTestRunnerMojo extends AbstractMojo {
         WebClient firephoque = TestRunnerUtils.getWebClient();
 
         // get list of selenium test
-        SeleniumUtils selenium = new SeleniumUtils();
-        selenium.scanForSeleniumTests(new File(testSourceDirectory));
-        List<File> tests = selenium.getTests();
+        SeleniumScanner scanner = new SeleniumScanner();
+        scanner.scanForSeleniumTests(new File(testSourceDirectory));
+        List<File> tests = scanner.getTests();
 
         boolean testsPassed = true;
+        String failedTest = "\n";
         try {
             // run all selenium test
             getLog().info("Executing " + tests.size() + " tests :");
             for (int i = 0; i < tests.size(); i++) {
 
-                // test path
-                String testFile = StringUtils.sub(tests.get(i).getPath(), testSourceDirectory, "");
-                // test display name & resultFileName
-                String displayTestFile = TestRunnerUtils.getResultFileName(testFile);
                 // the testrunner url to call
-                URL url = SeleniumUtils.testFileToTestrunnerUri(testFile, baseApplicationUrl.toString(), port);
+                URL url = TestRunnerUtils.getTestrunnerActionFullUrl(tests.get(i), baseApplicationUrl.toString(), port,
+                        testSourceDirectory);
+
+                String displayName = TestRunnerUtils.getTestDisplayName(tests.get(i), testSourceDirectory);
 
                 getLog().debug("Calling " + url.toString());
 
@@ -119,28 +118,29 @@ public class AutoTestRunnerMojo extends AbstractMojo {
 
                 // to know if a test passed or failed, we test if there is a file testName.PASSED|FAILED.html
                 while (retry < 5) {
-                    if (new File(outputDirectory + "/selenium-result/" + displayTestFile + "." + "passed.html")
-                            .exists()) {
-                        getLog().info(displayTestFile + "\t\t [PASSED]     ");
+                    if (new File(outputDirectory + "/selenium-result/" + displayName + "." + "passed.html").exists()) {
+                        getLog().info(displayName + "\t\t [PASSED]     ");
                         break;
                     }
-                    else if (new File(outputDirectory + "/selenium-result/" + displayTestFile + "." + "failed.html")
+                    else if (new File(outputDirectory + "/selenium-result/" + displayName + "." + "failed.html")
                             .exists()) {
-                        getLog().info(displayTestFile + "\t\t [FAILED!]     ");
+                        getLog().info(displayName + "\t\t [FAILED!]     ");
                         testsPassed = false;
+                        failedTest += "\t\t" + displayName + "\n";
                         break;
                     }
                     else {
                         if (retry++ == 4) {
                             System.out.print("\t\t ... ERROR ... ?  ");
                             getLog().debug(
-                                    "File " + outputDirectory + "/selenium-result/" + displayTestFile + "."
+                                    "File " + outputDirectory + "/selenium-result/" + displayName + "."
                                             + "[passed|failed].html not found !!!");
                             testsPassed = false;
+                            failedTest += "\t\t" + displayName + "\n";
                             break;
                         }
                         else {
-                            Thread.currentThread().sleep(1000);
+                            Thread.sleep(1000);
                         }
                     }
                 }
@@ -149,10 +149,13 @@ public class AutoTestRunnerMojo extends AbstractMojo {
             throw new MojoExecutionException(e.getMessage());
         } catch (InterruptedException e) {
             throw new MojoExecutionException(e.getMessage());
+        } finally {
+            firephoque.closeAllWindows();
+            server.shutdown();
         }
 
         if (!testsPassed) {
-            throw new MojoFailureException("There are some tests failure !");
+            throw new MojoFailureException("There are some tests failure :" + failedTest);
         }
     }
 }

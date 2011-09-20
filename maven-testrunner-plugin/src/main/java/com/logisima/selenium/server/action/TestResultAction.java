@@ -41,7 +41,6 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
 
 import com.logisima.selenium.utils.RequestUtils;
-import com.logisima.selenium.utils.SeleniumUtils;
 import com.logisima.selenium.utils.TestRunnerUtils;
 
 /**
@@ -77,8 +76,10 @@ public class TestResultAction extends ServerAction {
             if (!directoryResult.exists()) {
                 directoryResult.mkdirs();
             }
-            File resultFile = new File(outputDirectory + "/selenium-result/" + TestRunnerUtils.getResultFileName(test)
-                    + "." + result + ".html");
+            File resultFile = new File(outputDirectory
+                    + "/selenium-result/"
+                    + TestRunnerUtils.getTestDisplayName(new File(testSourceDirectory + "/" + test),
+                            testSourceDirectory.getAbsolutePath()) + "." + result + ".html");
 
             // initialize velocity
             Properties props = new Properties();
@@ -124,7 +125,7 @@ public class TestResultAction extends ServerAction {
             }
 
             // write result file into ./target/selenium-result/mytest.FAILED.html
-            SeleniumUtils.writeContent(sw.toString(), resultFile);
+            TestRunnerUtils.writeContent(sw.toString(), resultFile);
 
             // render template
         } catch (IOException e1) {

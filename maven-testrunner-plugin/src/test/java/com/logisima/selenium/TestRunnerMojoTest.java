@@ -20,8 +20,15 @@
 package com.logisima.selenium;
 
 import java.io.File;
+import java.net.URL;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.logisima.selenium.utils.TestRunnerUtils;
 
 public class TestRunnerMojoTest extends AbstractMojoTestCase {
 
@@ -29,8 +36,6 @@ public class TestRunnerMojoTest extends AbstractMojoTestCase {
      * @see junit.framework.TestCase#setUp()
      */
     protected void setUp() throws Exception {
-
-        // required for mojo lookups to work
         super.setUp();
     }
 
@@ -38,8 +43,36 @@ public class TestRunnerMojoTest extends AbstractMojoTestCase {
      * @throws Exception
      */
     public void testMojoGoal() throws Exception {
-        File testPom = new File(getBasedir(), "src/test/resources/pom.xml");
+        File testPom = new File(getBasedir(), "src/test/resources/mojotest/pom.xml");
         TestRunnerMojo mojo = (TestRunnerMojo) lookupMojo("run", testPom);
         assertNotNull(mojo);
+
+        class MojoThread extends Thread {
+
+            private TestRunnerMojo mojo;
+
+            public MojoThread(TestRunnerMojo mojo) {
+                this.mojo = mojo;
+            }
+
+            public void run() {
+                try {
+                    mojo.execute();
+                } catch (MojoExecutionException e) {
+                    fail(e.getMessage());
+                } catch (MojoFailureException e) {
+                    fail(e.getMessage());
+                }
+            }
+        }
+        MojoThread mojoThread = new MojoThread(mojo);
+        mojoThread.start();
+
+        WebClient firephoque = TestRunnerUtils.getWebClient();
+        URL url = new URL("http://localhost:7777");
+        HtmlPage page = firephoque.getPage(url);
+        assertEquals("Maven Selenium testrunner plugin - List", page.getTitleText());
+
+        mojoThread.interrupt();
     }
 }

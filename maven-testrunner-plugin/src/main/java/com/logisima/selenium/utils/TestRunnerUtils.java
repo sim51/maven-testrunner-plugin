@@ -19,12 +19,17 @@
  */
 package com.logisima.selenium.utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -42,6 +47,8 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.WebWindow;
 import com.gargoylesoftware.htmlunit.javascript.host.Window;
+import com.logisima.selenium.bean.TestScenario;
+import com.logisima.selenium.template.SeleniumTestRunnerTemplate;
 
 /**
  * Utils class for the testrunner application (or related to).
@@ -205,13 +212,131 @@ public class TestRunnerUtils {
     }
 
     /**
-     * Return the the display name of selenium script (by its path)
+     * Return the name of selenium script (relative path)
      * 
      * @param file
      * @return
      */
-    public static String getResultFileName(String file) {
-        return file.replace("/", ".").replaceFirst(".", "");
+    public static String getTestName(File test, String testSourceDirectory) {
+        String testName = test.getAbsolutePath();
+        testName = testName.substring(testSourceDirectory.length(), testName.length());
+        testName.replaceFirst(".", "");
+        return testName;
     }
 
+    /**
+     * Return the display name of selenium script
+     * 
+     * @param file
+     * @return
+     */
+    public static String getTestDisplayName(File test, String testSourceDirectory) {
+        String testName = test.getAbsolutePath();
+        testName = testName.substring(testSourceDirectory.length(), testName.length());
+        testName = testName.replaceAll("/", ".").replaceFirst(".", "");
+        return testName;
+    }
+
+    /**
+     * Method get the url of the test action for a selenium script.
+     * 
+     * @param test
+     * @return
+     */
+    public static String getTestActionUrl(File test, String testSourceDirectory) {
+        // test?test=$stringUtils.sub($test.path, $testSourceDirectory, '')
+        String url = "/test";
+        url += getTestName(test, testSourceDirectory);
+        return url;
+    }
+
+    /**
+     * Method get the url of the suite action for a selenium script.
+     * 
+     * @param test
+     * @return
+     */
+    public static String getSuiteActionUrl(File test, String testSourceDirectory) {
+        // suite.action%3Ftest%3D$stringUtils.sub($test.path, $testSourceDirectory, '')
+        String url = "/suite";
+        url += getTestName(test, testSourceDirectory);
+        return url;
+    }
+
+    /**
+     * Method get the url of the result action for a selenium script.
+     * 
+     * @param test
+     * @param testSourceDirectory
+     * @return
+     */
+    public static String getResultActionUrl(File test, String testSourceDirectory) {
+        String url = "/testresult";
+        url += getTestName(test, testSourceDirectory);
+        return url;
+    }
+
+    /**
+     * Methode to get the url of the testrunner action for a selenium script.
+     * 
+     * @param test
+     * @param port
+     * @param baseApplicationUrl
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public static String getTestrunnerActionUrl(File test, String baseApplicationUrl, String testSourceDirectory)
+            throws UnsupportedEncodingException {
+        String url = "/TestRunner.html?baseUrl=";
+        url += baseApplicationUrl;
+        url += "&auto=true&test=";
+        url += URLEncoder.encode(getSuiteActionUrl(test, testSourceDirectory), "UTF-8");
+        url += "&resultsUrl=";
+        url += URLEncoder.encode(getResultActionUrl(test, testSourceDirectory), "UTF-8");
+        return url;
+    }
+
+    /**
+     * Methode to get the full url of the testrunner action for a selenium script.
+     * 
+     * @param test
+     * @param baseApplicationUrl
+     * @param port
+     * @param testSourceDirectory
+     * @return
+     * @throws IOException
+     */
+    public static URL getTestrunnerActionFullUrl(File test, String baseApplicationUrl, int port,
+            String testSourceDirectory) throws IOException {
+        String url = "http://localhost:" + port;
+        url += getTestrunnerActionUrl(test, baseApplicationUrl, testSourceDirectory);
+        return new URL(url);
+    }
+
+    /**
+     * Create and write <code>content</code> to the <code>file</code>.
+     * 
+     * @param content
+     * @param file
+     * @throws IOException
+     */
+    public static void writeContent(CharSequence content, File file) throws IOException {
+        FileWriter fstream = new FileWriter(file.getPath());
+        BufferedWriter out = new BufferedWriter(fstream);
+        out.write(content.toString());
+        out.close();
+    }
+
+    /**
+     * Parse a test file and return a list of test scenario.
+     * 
+     * @param test
+     * @return
+     * @throws IOException
+     */
+    public static List<TestScenario> parseTestFile(File test) throws IOException {
+        SeleniumParser parser = new SeleniumParser(test);
+        parser.execute();
+        return parser.getScenarios();
+    }
 }

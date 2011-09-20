@@ -7,7 +7,9 @@
         </tr>
         <tr>
             <td>
-                <a href="/test.action?test=$stringUtils.sub($test.path, $testSourceDirectory, '')">$test.name</a>
+                <a href="$TRUtils.getTestActionUrl($test, $testSourceDirectory)">
+                	$TRUtils.getTestDisplayName($test, $testSourceDirectory)
+                </a>
             </td>
         </tr>
     </tbody>

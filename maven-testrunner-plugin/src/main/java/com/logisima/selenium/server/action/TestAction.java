@@ -41,8 +41,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
 
 import com.logisima.selenium.bean.TestScenario;
-import com.logisima.selenium.utils.RequestUtils;
-import com.logisima.selenium.utils.SeleniumUtils;
+import com.logisima.selenium.utils.TestRunnerUtils;
 
 /**
  * Server action to generate the selenium test file.
@@ -68,10 +67,10 @@ public class TestAction extends ServerAction {
     public void execute() {
         try {
             // we retrive data for the template
-            String testPath = RequestUtils.getParameter(request, "test");
-            File testFile = new File(testSourceDirectory + testPath);
+            String testPath = request.getUri().replaceFirst("/test", "");
+            File testFile = new File(testSourceDirectory + testPath.split("[?]")[0]);
             List<TestScenario> tests;
-            tests = SeleniumUtils.parseTestFile(testFile);
+            tests = TestRunnerUtils.parseTestFile(testFile);
 
             // initialize velocity
             Properties props = new Properties();
@@ -81,6 +80,7 @@ public class TestAction extends ServerAction {
             props.setProperty("runtime.log.logsystem.log4j.logger", "VELOCITY");
             props.setProperty("classpath." + VelocityEngine.RESOURCE_LOADER + ".class",
                     ClasspathResourceLoader.class.getName());
+
             Velocity.init(props);
             VelocityContext context = new VelocityContext();
             // put parameter for template
