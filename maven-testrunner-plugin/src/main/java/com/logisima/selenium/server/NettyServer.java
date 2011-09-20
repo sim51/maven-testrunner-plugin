@@ -46,6 +46,10 @@ public class NettyServer extends Thread {
      * Bootsrap instance of the running server
      */
     private ServerBootstrap bootstrap;
+
+    /**
+     * Channel server
+     */
     private Channel         channel;
 
     /**
@@ -110,11 +114,13 @@ public class NettyServer extends Thread {
         channel = bootstrap.bind(new InetSocketAddress(port));
     }
 
-    public void shutdown() {
+    public void interrupt() {
+        // Step 1: closing all channel an wait that all are closed
         ChannelFuture cFuture = channel.close();
         cFuture.awaitUninterruptibly();
         cFuture.getChannel().getCloseFuture().awaitUninterruptibly();
+        // Step 2 : we release all resource
         bootstrap.getFactory().releaseExternalResources();
-        this.interrupt();
+        super.interrupt();
     }
 }

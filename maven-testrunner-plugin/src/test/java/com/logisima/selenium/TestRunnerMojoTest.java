@@ -25,6 +25,8 @@ import java.net.URL;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.junit.After;
+import org.junit.Before;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -32,9 +34,9 @@ import com.logisima.selenium.utils.TestRunnerUtils;
 
 public class TestRunnerMojoTest extends AbstractMojoTestCase {
 
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
+    private TestRunnerMojo mojo;
+
+    @Before
     protected void setUp() throws Exception {
         super.setUp();
     }
@@ -44,7 +46,7 @@ public class TestRunnerMojoTest extends AbstractMojoTestCase {
      */
     public void testMojoGoal() throws Exception {
         File testPom = new File(getBasedir(), "src/test/resources/mojotest/pom.xml");
-        TestRunnerMojo mojo = (TestRunnerMojo) lookupMojo("run", testPom);
+        mojo = (TestRunnerMojo) lookupMojo("run", testPom);
         assertNotNull(mojo);
 
         class MojoThread extends Thread {
@@ -64,6 +66,11 @@ public class TestRunnerMojoTest extends AbstractMojoTestCase {
                     fail(e.getMessage());
                 }
             }
+
+            public void interrupt() {
+                super.interrupt();
+                mojo.interrupt();
+            }
         }
         MojoThread mojoThread = new MojoThread(mojo);
         mojoThread.start();
@@ -71,8 +78,20 @@ public class TestRunnerMojoTest extends AbstractMojoTestCase {
         WebClient firephoque = TestRunnerUtils.getWebClient();
         URL url = new URL("http://localhost:7777");
         HtmlPage page = firephoque.getPage(url);
+
         assertEquals("Maven Selenium testrunner plugin - List", page.getTitleText());
 
+        firephoque.closeAllWindows();
         mojoThread.interrupt();
+
+    }
+
+    @After
+    public void tearDown() {
+        try {
+            super.tearDown();
+            mojo.interrupt();
+        } catch (Exception e) {
+        }
     }
 }

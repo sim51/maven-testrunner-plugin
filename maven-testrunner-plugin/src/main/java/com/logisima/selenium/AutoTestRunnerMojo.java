@@ -45,7 +45,7 @@ public class AutoTestRunnerMojo extends AbstractMojo {
      * 
      * @parameter expression="${logisima.port}" default-value="7777"
      */
-    private Integer port;
+    private Integer     port;
 
     /**
      * Url of the application to test.
@@ -53,7 +53,7 @@ public class AutoTestRunnerMojo extends AbstractMojo {
      * @parameter expression="${logisima.baseApplicationUrl}"
      * @required
      */
-    private URL     baseApplicationUrl;
+    private URL         baseApplicationUrl;
 
     /**
      * The directory for the generated WAR.
@@ -62,7 +62,7 @@ public class AutoTestRunnerMojo extends AbstractMojo {
      * @required
      * @readonly
      */
-    private String  outputDirectory;
+    private String      outputDirectory;
 
     /**
      * The directory of test
@@ -71,7 +71,12 @@ public class AutoTestRunnerMojo extends AbstractMojo {
      * @required
      * @readonly
      */
-    private String  testSourceDirectory;
+    private String      testSourceDirectory;
+
+    /**
+     * Netty serever for testrunner
+     */
+    private NettyServer server;
 
     /**
      * Execute method of the Mojo.
@@ -84,8 +89,8 @@ public class AutoTestRunnerMojo extends AbstractMojo {
         getLog().debug("Selenium testrunning has been deployed");
 
         // Start the server
-        NettyServer server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl,
-                testSourceDirectory, outputDirectory);
+        server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl, testSourceDirectory,
+                outputDirectory);
         server.run();
 
         // get firephoque
@@ -151,11 +156,15 @@ public class AutoTestRunnerMojo extends AbstractMojo {
             throw new MojoExecutionException(e.getMessage());
         } finally {
             firephoque.closeAllWindows();
-            server.shutdown();
+            server.interrupt();
         }
 
         if (!testsPassed) {
             throw new MojoFailureException("There are some tests failure :" + failedTest);
         }
+    }
+
+    public void interrupt() {
+        server.interrupt();
     }
 }

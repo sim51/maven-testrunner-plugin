@@ -42,7 +42,7 @@ public class TestRunnerMojo extends AbstractMojo {
      * 
      * @parameter expression="${logisima.port}" default-value="7777"
      */
-    private Integer port;
+    private Integer     port;
 
     /**
      * Url of the application to test.
@@ -50,7 +50,7 @@ public class TestRunnerMojo extends AbstractMojo {
      * @parameter expression="${logisima.baseApplicationUrl}"
      * @required
      */
-    private URL     baseApplicationUrl;
+    private URL         baseApplicationUrl;
 
     /**
      * The directory for the generated WAR.
@@ -59,7 +59,7 @@ public class TestRunnerMojo extends AbstractMojo {
      * @required
      * @readonly
      */
-    private String  outputDirectory;
+    private String      outputDirectory;
 
     /**
      * The directory of test
@@ -68,7 +68,12 @@ public class TestRunnerMojo extends AbstractMojo {
      * @required
      * @readonly
      */
-    private String  testSourceDirectory;
+    private String      testSourceDirectory;
+
+    /**
+     * Netty serever for testrunner
+     */
+    private NettyServer server;
 
     /**
      * Execute method of the Mojo.
@@ -82,8 +87,8 @@ public class TestRunnerMojo extends AbstractMojo {
         getLog().debug("Selenium testrunning has been deployed");
 
         // Start the server
-        NettyServer server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl,
-                testSourceDirectory, outputDirectory);
+        this.server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl, testSourceDirectory,
+                outputDirectory);
         server.run();
 
         getLog().info("Selenium testrunner server is running on port " + port);
@@ -99,7 +104,11 @@ public class TestRunnerMojo extends AbstractMojo {
         } catch (InterruptedException e) {
             throw new MojoExecutionException(e.getMessage());
         } finally {
-            server.shutdown();
+            server.interrupt();
         }
+    }
+
+    public void interrupt() {
+        server.interrupt();
     }
 }
