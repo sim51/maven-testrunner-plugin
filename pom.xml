@@ -156,13 +156,13 @@
 	<!-- = Distribution management = -->
 	<!-- =========================== -->
 	<distributionManagement>
-		<repository>
-			<id>logisima-releases</id>
-			<url>https://github.com/logisima/maven-repository/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>logisima-snapshots</id>
-			<url>https://github.com/logisima/maven-repository/snapshots</url>
-		</snapshotRepository>
+                <repository>
+                        <id>logisima-releases</id>
+                        <url>file:/home/bsimard/workspace_logisima/logisima-maven-repository/releases</url>
+                </repository>
+                <snapshotRepository>
+                        <id>logisima-snapshots</id>
+                        <url>file:/home/bsimard/workspace_logisima/logisima-maven-repository/snapshots</url>
+                </snapshotRepository>	
 	</distributionManagement>
 </project>
