@@ -17,16 +17,16 @@ This module is a port of selenium testrunner of playframework. It use the same t
 * Add this repository into your pom.xml :
 	<repository>
 		<id>logisima-releases</id>
-		<url>https://github.com/logisima/maven-repository/releases&lt;/url>
+		<url>https://github.com/logisima/maven-repository/releases</url>
 	</repository>
 
 * Add this to your build phase into your pom.xml
 	<plugin>
 		<groupId>logisima</groupId>
 		<artifactId>maven-testrunner-plugin</artifactId>
-		<version>1.0</version>
+		<version>1.2</version>
 		<configuration>
-			<baseApplicationUrl>http://localhost:8080/monApp&lt;/baseApplicationUrl>	
+			<baseApplicationUrl>http://localhost:8080/monApp</baseApplicationUrl>	
 		</configuration>
 	</plugin>
 Where "http://localhost:8080/monApp&quot; is the url of your application to test. 
