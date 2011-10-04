@@ -10,8 +10,10 @@
        		<ul>
        			#foreach( $test in $tests )
 				    <li>
-				    	<a href="$TRUtils.getTestrunnerActionUrl($test, $baseApplicationUrl, $testSourceDirectory)">
-				    		$TRUtils.getTestDisplayName($test, $testSourceDirectory)
+				    	#set($url = $TRUtils.getTestrunnerActionUrl($test, $baseApplicationUrl, $testSourceDirectory))
+				    	#set($name = $TRUtils.getTestDisplayName($test, $testSourceDirectory)) 
+				    	<a href='$url' target="_blank">
+				    		$name
 				    	</a>
 				    </li>
 				#end

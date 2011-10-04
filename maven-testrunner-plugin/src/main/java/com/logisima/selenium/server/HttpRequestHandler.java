@@ -37,8 +37,10 @@ import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+import org.jboss.netty.handler.codec.http.HttpChunk;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.util.CharsetUtil;
 
 import com.logisima.selenium.server.action.ListTestAction;
 import com.logisima.selenium.server.action.ServerAction;
@@ -52,27 +54,30 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
     /**
      * The request
      */
-    private HttpRequest request;
+    private HttpRequest         request;
 
     /**
      * Document of the server
      */
-    private File        documentRoot;
+    private File                documentRoot;
 
     /**
      * The url of the application to test
      */
-    private URL         baseApplicationUrl;
+    private URL                 baseApplicationUrl;
 
     /**
      * Directory of test source
      */
-    private File        testSourceDirectory;
+    private File                testSourceDirectory;
 
     /**
      * maven target directory
      */
-    private File        outputDirectory;
+    private File                outputDirectory;
+
+    private boolean             readingChunks;
+    private final StringBuilder chunksBuf = new StringBuilder();
 
     /**
      * The constructor.
@@ -92,14 +97,31 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        HttpRequest request = this.request = (HttpRequest) e.getMessage();
+        if (!readingChunks) {
+            HttpRequest request = this.request = (HttpRequest) e.getMessage();
 
-        if (is100ContinueExpected(request)) {
-            send100Continue(e);
+            if (is100ContinueExpected(request)) {
+                send100Continue(e);
+            }
+
+            if (request.isChunked()) {
+                readingChunks = true;
+            }
+            else {
+                // do the response
+                writeResponse(e);
+            }
         }
-
-        // do the response
-        writeResponse(e);
+        else {
+            HttpChunk chunk = (HttpChunk) e.getMessage();
+            if (chunk.isLast()) {
+                readingChunks = false;
+                writeResponse(e);
+            }
+            else {
+                chunksBuf.append(chunk.getContent().toString(CharsetUtil.UTF_8) + "\r\n");
+            }
+        }
 
     }
 
@@ -116,23 +138,24 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
         // The default action, list all selenium test
         if (request.getUri().equals("/")) {
-            action = new ListTestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+            action = new ListTestAction(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
         // action that generate the selenium script
         else if (request.getUri().startsWith("/test/")) {
-            action = new TestAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+            action = new TestAction(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
         // action that generate the suite file for the testrunner
         else if (request.getUri().startsWith("/suite")) {
-            action = new SuiteAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+            action = new SuiteAction(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
         // action that generate the result file
         else if (request.getUri().startsWith("/testresult/")) {
-            action = new TestResultAction(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+            action = new TestResultAction(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
         else {
             // It's a static file
-            action = new StaticAction(request, documentRoot, baseApplicationUrl, testSourceDirectory, outputDirectory);
+            action = new StaticAction(request, chunksBuf, documentRoot, baseApplicationUrl, testSourceDirectory,
+                    outputDirectory);
         }
 
         action.execute();

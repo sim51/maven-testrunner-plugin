@@ -52,12 +52,14 @@ public class SuiteAction extends ServerAction {
      * Constructor.
      * 
      * @param request
+     * @param chunksBuf
      * @param baseApplicationUrl
      * @param testSourceDirectory
      * @param outputDirectory
      */
-    public SuiteAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
-        super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+    public SuiteAction(HttpRequest request, StringBuilder chunksBuf, URL baseApplicationUrl, File testSourceDirectory,
+            File outputDirectory) {
+        super(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }
 
     @Override

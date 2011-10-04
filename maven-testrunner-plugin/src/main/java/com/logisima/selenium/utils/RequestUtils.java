@@ -70,10 +70,17 @@ public class RequestUtils {
      * @return
      * @throws UnsupportedEncodingException
      */
-    public static Map<String, String> getPostParameters(HttpRequest request) throws UnsupportedEncodingException {
+    public static Map<String, String> getPostParameters(HttpRequest request, StringBuilder chunksBuf)
+            throws UnsupportedEncodingException {
         Map<String, String> postArgs = new HashMap<String, String>();
-        ChannelBuffer cbContent = request.getContent();
-        String content = cbContent.toString(CharsetUtil.UTF_8);
+        String content;
+        if (request.isChunked()) {
+            content = chunksBuf.toString();
+        }
+        else {
+            ChannelBuffer cbContent = request.getContent();
+            content = cbContent.toString(CharsetUtil.UTF_8);
+        }
         String[] arguments = content.split("&");
         for (int i = 1; i < arguments.length; i++) {
             String[] arg = arguments[i].split("=");

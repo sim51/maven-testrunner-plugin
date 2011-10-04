@@ -21,6 +21,8 @@ package com.logisima.selenium;
 
 import java.io.File;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -40,15 +42,15 @@ public class AutoTestRunnerMojoTest extends AbstractMojoTestCase {
      */
     public void testMojoGoal() throws Exception {
         File testPom = new File(getBasedir(), "src/test/resources/mojotest/pom.xml");
-        // mojo = (AutoTestRunnerMojo) lookupMojo("auto-run", testPom);
-        // assertNotNull(mojo);
-        // try {
-        // mojo.execute();
-        // } catch (MojoExecutionException e) {
-        // fail(e.getMessage());
-        // } catch (MojoFailureException e) {
-        // assertEquals("There are some tests failure :\n\t\tApplication.test.html\n", e.getMessage());
-        // }
+        mojo = (AutoTestRunnerMojo) lookupMojo("auto-run", testPom);
+        assertNotNull(mojo);
+        try {
+            mojo.execute();
+        } catch (MojoExecutionException e) {
+            fail(e.getMessage());
+        } catch (MojoFailureException e) {
+            assertEquals("There are some tests failure :\n\t\tApplication.test.html\n", e.getMessage());
+        }
     }
 
     @After

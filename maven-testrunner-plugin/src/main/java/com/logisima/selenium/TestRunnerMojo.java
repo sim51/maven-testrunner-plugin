@@ -88,7 +88,7 @@ public class TestRunnerMojo extends AbstractMojo {
 
         // Start the server
         this.server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl, testSourceDirectory,
-                outputDirectory);
+                outputDirectory, 1);
         server.run();
 
         getLog().info("Selenium testrunner server is running on port " + port);
@@ -108,7 +108,8 @@ public class TestRunnerMojo extends AbstractMojo {
         }
     }
 
-    public void interrupt() {
+    public void interrupt() throws InterruptedException {
         server.interrupt();
+        server.join();
     }
 }

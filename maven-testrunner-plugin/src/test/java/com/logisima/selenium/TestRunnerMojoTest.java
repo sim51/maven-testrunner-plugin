@@ -61,15 +61,20 @@ public class TestRunnerMojoTest extends AbstractMojoTestCase {
                 try {
                     mojo.execute();
                 } catch (MojoExecutionException e) {
+                    Thread.currentThread().interrupt();
                     fail(e.getMessage());
                 } catch (MojoFailureException e) {
+                    Thread.currentThread().interrupt();
                     fail(e.getMessage());
                 }
             }
 
             public void interrupt() {
                 super.interrupt();
-                mojo.interrupt();
+                try {
+                    mojo.interrupt();
+                } catch (InterruptedException e) {
+                }
             }
         }
         MojoThread mojoThread = new MojoThread(mojo);
@@ -83,6 +88,7 @@ public class TestRunnerMojoTest extends AbstractMojoTestCase {
 
         firephoque.closeAllWindows();
         mojoThread.interrupt();
+        mojoThread.join();
 
     }
 

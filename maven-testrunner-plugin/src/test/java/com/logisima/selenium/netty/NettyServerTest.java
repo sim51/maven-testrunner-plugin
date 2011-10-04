@@ -44,7 +44,7 @@ public class NettyServerTest extends TestCase {
 
     private File        projectTestPathFile;
     private NettyServer server;
-    private WebClient   firephoque = TestRunnerUtils.getWebClient();
+    private WebClient   firephoque;
 
     @Before
     public void setUp() throws MojoExecutionException, MalformedURLException {
@@ -57,24 +57,36 @@ public class NettyServerTest extends TestCase {
         File script = new File(url2.getFile());
         String projectTestPath = script.getParentFile().getParentFile().getParentFile().toString() + "/src/test";
         projectTestPathFile = new File(projectTestPath);
-        URL url = new URL("http://localhost:8888");
+        URL url = new URL("http://localhost:7777");
 
         // starting server
-        server = new NettyServer(8888, seleniumTarget.getPath(), url, projectTestPathFile.getAbsolutePath(),
-                FileUtils.getTempDirectoryPath() + "/selenium");
+        server = new NettyServer(7777, seleniumTarget.getPath(), url, projectTestPathFile.getAbsolutePath(),
+                FileUtils.getTempDirectoryPath() + "/selenium", 5);
         server.start();
+        try {
+            server.join();
+        } catch (InterruptedException e) {
+        }
+
+        // get firephoque
+        firephoque = TestRunnerUtils.getWebClient();
+        firephoque.setTimeout(1000);
     }
 
     @Test
     public void testListActionServer() throws MojoExecutionException, FailingHttpStatusCodeException, IOException {
-        HtmlPage page = firephoque.getPage(new URL("http://localhost:8888/"));
+        HtmlPage page = firephoque.getPage(new URL("http://localhost:7777/"));
         assertEquals("Maven Selenium testrunner plugin - List", page.getTitleText());
+        assertTrue(page
+                .asXml()
+                .contains(
+                        "<a href=\"/TestRunner.html?baseUrl=http://localhost:7777&amp;auto=true&amp;test=%2Fsuite%2Fresources%2Fcom%2Flogisima%2Ftest%2Fselenium.test.html&amp;"));
     }
 
     @Test
     public void testSuiteActionServer() throws MojoExecutionException, FailingHttpStatusCodeException, IOException {
         File seleniumScript = new File(projectTestPathFile.getAbsolutePath() + "/resources/selenium.test.html");
-        URL suiteUrl = new URL("http://localhost:8888"
+        URL suiteUrl = new URL("http://localhost:7777"
                 + TestRunnerUtils.getSuiteActionUrl(seleniumScript, projectTestPathFile.getAbsolutePath()));
         HtmlPage page = firephoque.getPage(suiteUrl);
         assertTrue(page.asText().contains("Maven Selenium testrunner plugin - List"));
@@ -84,7 +96,7 @@ public class NettyServerTest extends TestCase {
     @Test
     public void testTestActionServer() throws MojoExecutionException, FailingHttpStatusCodeException, IOException {
         File seleniumScript = new File(projectTestPathFile.getAbsolutePath() + "/resources/selenium.test.html");
-        URL suiteUrl = new URL("http://localhost:8888"
+        URL suiteUrl = new URL("http://localhost:7777"
                 + TestRunnerUtils.getTestActionUrl(seleniumScript, projectTestPathFile.getAbsolutePath()));
         HtmlPage page = firephoque.getPage(suiteUrl);
         assertTrue(page.asText().contains("open"));
@@ -92,13 +104,42 @@ public class NettyServerTest extends TestCase {
     }
 
     @Test
-    public void testRunSeleniumServer() throws MojoExecutionException, IOException {
+    public void testRunSeleniumServer() throws MojoExecutionException, IOException, InterruptedException {
         File seleniumScript = new File(projectTestPathFile.getAbsolutePath() + "/resources/selenium.test.html");
         WebWindow window = firephoque.openWindow(TestRunnerUtils.getTestrunnerActionFullUrl(seleniumScript,
-                "http://localhost:8888", 8888, projectTestPathFile.getAbsolutePath()), "headless");
+                "http://localhost:7777", 7777, projectTestPathFile.getAbsolutePath()), "headless");
 
         File resultFile = new File(FileUtils.getTempDirectoryPath()
                 + "/selenium/selenium-result/resources.selenium.test.html.passed.html");
+        Thread.sleep(5000);
+        if (!resultFile.exists()) {
+            fail("Selenium auto test failed !");
+        }
+    }
+
+    @Test
+    public void testRunSeleniumServerChunk() throws MojoExecutionException, IOException, InterruptedException {
+        File seleniumScript = new File(projectTestPathFile.getAbsolutePath() + "/resources/NotLoggedUser.test.html");
+        WebWindow window = firephoque.openWindow(TestRunnerUtils.getTestrunnerActionFullUrl(seleniumScript,
+                "http://localhost:7777", 7777, projectTestPathFile.getAbsolutePath()), "headless");
+
+        File resultFile = new File(FileUtils.getTempDirectoryPath()
+                + "/selenium/selenium-result/resources.NotLoggedUser.test.html.failed.html");
+        Thread.sleep(5000);
+        if (!resultFile.exists()) {
+            fail("Selenium auto test passed !");
+        }
+    }
+
+    @Test
+    public void testRunSeleniumServerSeleniumIDE() throws MojoExecutionException, IOException, InterruptedException {
+        File seleniumScript = new File(projectTestPathFile.getAbsolutePath() + "/resources/seleniumIDE.test.html");
+        WebWindow window = firephoque.openWindow(TestRunnerUtils.getTestrunnerActionFullUrl(seleniumScript,
+                "http://localhost:7777", 7777, projectTestPathFile.getAbsolutePath()), "headless");
+
+        File resultFile = new File(FileUtils.getTempDirectoryPath()
+                + "/selenium/selenium-result/resources.seleniumIDE.test.html.passed.html");
+        Thread.sleep(5000);
         if (!resultFile.exists()) {
             fail("Selenium auto test failed !");
         }
@@ -108,5 +149,9 @@ public class NettyServerTest extends TestCase {
     public void tearDown() {
         firephoque.closeAllWindows();
         server.interrupt();
+        try {
+            server.join();
+        } catch (InterruptedException e) {
+        }
     }
 }

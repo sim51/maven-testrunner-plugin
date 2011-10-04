@@ -49,14 +49,15 @@ public class StaticAction extends ServerAction {
      * Constructor.
      * 
      * @param request
+     * @param chunksBuf
      * @param documentRoot
      * @param baseApplicationUrl
      * @param testSourceDirectory
      * @param outputDirectory
      */
-    public StaticAction(HttpRequest request, File documentRoot, URL baseApplicationUrl, File testSourceDirectory,
-            File outputDirectory) {
-        super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+    public StaticAction(HttpRequest request, StringBuilder chunksBuf, File documentRoot, URL baseApplicationUrl,
+            File testSourceDirectory, File outputDirectory) {
+        super(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
         this.documentRoot = documentRoot;
     }
 

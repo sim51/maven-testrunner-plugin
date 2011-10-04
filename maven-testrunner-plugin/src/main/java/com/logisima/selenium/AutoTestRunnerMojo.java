@@ -90,7 +90,7 @@ public class AutoTestRunnerMojo extends AbstractMojo {
 
         // Start the server
         server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl, testSourceDirectory,
-                outputDirectory);
+                outputDirectory, 1);
         server.run();
 
         // get firephoque
@@ -164,7 +164,8 @@ public class AutoTestRunnerMojo extends AbstractMojo {
         }
     }
 
-    public void interrupt() {
+    public void interrupt() throws InterruptedException {
         server.interrupt();
+        server.join();
     }
 }

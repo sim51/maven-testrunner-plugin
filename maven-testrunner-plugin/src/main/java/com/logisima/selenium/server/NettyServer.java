@@ -26,7 +26,10 @@ import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelException;
+import org.jboss.netty.channel.ChannelFactory;
+import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 /**
@@ -40,37 +43,47 @@ public class NettyServer extends Thread {
     /**
      * port of the server.
      */
-    private Integer         port;
+    private Integer                   port;
 
     /**
      * Bootsrap instance of the running server
      */
-    private ServerBootstrap bootstrap;
+    private ServerBootstrap           bootstrap;
 
     /**
-     * Channel server
+     * Channel group of "seleniumServer"
      */
-    private Channel         channel;
+    private static final ChannelGroup channelGroup = new DefaultChannelGroup("seleniumServer");
+
+    /**
+     * Channel factory
+     */
+    private ChannelFactory            factory;
 
     /**
      * DocumentRoot of the server.
      */
-    private File            documentRoot;
+    private File                      documentRoot;
 
     /**
      * Url of the application to test
      */
-    private URL             baseApplicationUrl;
+    private URL                       baseApplicationUrl;
 
     /**
      * Maven test folder
      */
-    private File            testSourceDirectory;
+    private File                      testSourceDirectory;
 
     /**
      * Maven target folder
      */
-    private File            outputDirectory;
+    private File                      outputDirectory;
+
+    /**
+     * Max number of retry for startup
+     */
+    private Integer                   nbMaxRetry;
 
     /**
      * Constructor.
@@ -82,22 +95,26 @@ public class NettyServer extends Thread {
      * @param outputDirectory
      */
     public NettyServer(Integer port, String documentRoot, URL baseApplicationUrl, String testSourceDirectory,
-            String outputDirectory) {
+            String outputDirectory, Integer nbMaxRetry) {
         super();
         this.port = port;
         this.documentRoot = new File(documentRoot);
         this.baseApplicationUrl = baseApplicationUrl;
         this.testSourceDirectory = new File(testSourceDirectory);
         this.outputDirectory = new File(outputDirectory);
+        this.nbMaxRetry = nbMaxRetry;
     }
 
     /**
      * Method to run the server.
      */
     public void run() {
+        // create the factory
+        this.factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),
+                Executors.newCachedThreadPool(), Runtime.getRuntime().availableProcessors() * 2 + 1);
+
         // create the boostrap server
-        this.bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),
-                Executors.newCachedThreadPool(), Runtime.getRuntime().availableProcessors() * 2 + 1));
+        this.bootstrap = new ServerBootstrap(this.factory);
 
         // Set up the event pipeline factory.
         this.bootstrap.setPipelineFactory(new HttpServerPipelineFactory(documentRoot, baseApplicationUrl,
@@ -110,17 +127,33 @@ public class NettyServer extends Thread {
         bootstrap.setOption("child.connectTimeoutMillis", 100);
         bootstrap.setOption("readWriteFair", true);
 
-        // Bind and start to accept incoming connections.
-        channel = bootstrap.bind(new InetSocketAddress(port));
+        // Bind and start to accept incoming connections.ted
+        Boolean isStarted = false;
+        Integer nbRetry = 0;
+        while (!isStarted && nbRetry < nbMaxRetry) {
+            try {
+                Channel channel = bootstrap.bind(new InetSocketAddress(port));
+                channelGroup.add(channel);
+                isStarted = true;
+            } catch (ChannelException e) {
+                nbRetry += 1;
+            }
+        }
+        if (!isStarted) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Server is not started !!!");
+        }
     }
 
     public void interrupt() {
         // Step 1: closing all channel an wait that all are closed
-        ChannelFuture cFuture = channel.close();
-        cFuture.awaitUninterruptibly();
-        cFuture.getChannel().getCloseFuture().awaitUninterruptibly();
-        // Step 2 : we release all resource
-        bootstrap.getFactory().releaseExternalResources();
+        Boolean shutdownOk = false;
+        while (!shutdownOk) {
+            shutdownOk = this.channelGroup.close().awaitUninterruptibly(100);
+        }
+        // Step 2: release external resource
+        this.factory.releaseExternalResources();
+        // Step 3: interrupt the thread
         super.interrupt();
     }
 }

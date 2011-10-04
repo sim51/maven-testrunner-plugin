@@ -55,19 +55,21 @@ public class TestResultAction extends ServerAction {
      * Constructor.
      * 
      * @param request
+     * @param chunksBuf
      * @param baseApplicationUrl
      * @param testSourceDirectory
      * @param outputDirectory
      */
-    public TestResultAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
-        super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+    public TestResultAction(HttpRequest request, StringBuilder chunksBuf, URL baseApplicationUrl,
+            File testSourceDirectory, File outputDirectory) {
+        super(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }
 
     @Override
     public void execute() {
         try {
             // we retrive data for the template
-            Map<String, String> parameters = RequestUtils.getPostParameters(request);
+            Map<String, String> parameters = RequestUtils.getPostParameters(request, chunksBuf);
             String test = request.getUri().replaceFirst("/testresult/", "");
             String table = parameters.get("testTable.1");
             String result = parameters.get("result");

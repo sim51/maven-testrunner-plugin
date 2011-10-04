@@ -19,9 +19,11 @@
  */
 package com.logisima.selenium.utils;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -328,7 +330,7 @@ public class TestRunnerUtils {
     }
 
     /**
-     * Parse a test file and return a list of test scenario.
+     * Parse a play! test file and return a list of test scenario.
      * 
      * @param test
      * @return
@@ -338,5 +340,36 @@ public class TestRunnerUtils {
         SeleniumParser parser = new SeleniumParser(test);
         parser.execute();
         return parser.getScenarios();
+    }
+
+    /**
+     * Method to khnow if a file is selenium IDE file (true)or a play! one (false).
+     * 
+     * @param test file to test
+     * @param
+     * @return
+     * @throws IOException
+     */
+    public static Boolean IsSeleniumIdeFile(File test) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(test));
+        String strLine;
+        while ((strLine = br.readLine()) != null) {
+            if (strLine.contains("selenium.base")) {
+                br.close();
+                return Boolean.TRUE;
+            }
+        }
+        br.close();
+        return Boolean.FALSE;
+    }
+
+    public static String getFileContent(File file) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String content = "";
+        String strLine;
+        while ((strLine = br.readLine()) != null) {
+            content += strLine + "\n";
+        }
+        return content;
     }
 }

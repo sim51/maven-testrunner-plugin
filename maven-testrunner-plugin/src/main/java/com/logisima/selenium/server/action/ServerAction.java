@@ -37,6 +37,7 @@ public abstract class ServerAction {
     protected String             contentType;
     protected ChannelBuffer      content;
     protected HttpRequest        request;
+    protected StringBuilder      chunksBuf;
     protected HttpResponseStatus status;
 
     protected URL                baseApplicationUrl;
@@ -46,10 +47,12 @@ public abstract class ServerAction {
     /**
      * Constructor
      */
-    public ServerAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
+    public ServerAction(HttpRequest request, StringBuilder chunksBuf, URL baseApplicationUrl, File testSourceDirectory,
+            File outputDirectory) {
         super();
         this.status = HttpResponseStatus.OK;
         this.request = request;
+        this.chunksBuf = chunksBuf;
         this.baseApplicationUrl = baseApplicationUrl;
         this.testSourceDirectory = testSourceDirectory;
         this.outputDirectory = outputDirectory;

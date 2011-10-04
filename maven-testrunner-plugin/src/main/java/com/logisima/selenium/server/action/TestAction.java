@@ -55,12 +55,14 @@ public class TestAction extends ServerAction {
      * Constructor.
      * 
      * @param request
+     * @param chunksBuf
      * @param baseApplicationUrl
      * @param testSourceDirectory
      * @param outputDirectory
      */
-    public TestAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
-        super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+    public TestAction(HttpRequest request, StringBuilder chunksBuf, URL baseApplicationUrl, File testSourceDirectory,
+            File outputDirectory) {
+        super(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }
 
     @Override
@@ -69,50 +71,59 @@ public class TestAction extends ServerAction {
             // we retrive data for the template
             String testPath = request.getUri().replaceFirst("/test", "");
             File testFile = new File(testSourceDirectory + testPath.split("[?]")[0]);
-            List<TestScenario> tests;
-            tests = TestRunnerUtils.parseTestFile(testFile);
-
-            // initialize velocity
-            Properties props = new Properties();
-            props.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
-            props.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-                    "org.apache.velocity.runtime.log.Log4JLogChute");
-            props.setProperty("runtime.log.logsystem.log4j.logger", "VELOCITY");
-            props.setProperty("classpath." + VelocityEngine.RESOURCE_LOADER + ".class",
-                    ClasspathResourceLoader.class.getName());
-
-            Velocity.init(props);
-            VelocityContext context = new VelocityContext();
-            // put parameter for template
-            context.put("tests", tests);
-
-            // get the template
-            Template template = null;
-            try {
-                template = Velocity.getTemplate("com/logisima/selenium/template/test.vm");
-                StringWriter sw = new StringWriter();
-                template.merge(context, sw);
-                // create the response
+            // if file is a selenium IDE file, we have nothing to do
+            if (TestRunnerUtils.IsSeleniumIdeFile(testFile)) {
+                String content = TestRunnerUtils.getFileContent(testFile);
                 this.contentType = "text/html; charset=utf-8";
-                this.content = ChannelBuffers.copiedBuffer(sw.toString(), CharsetUtil.UTF_8);
-            } catch (ResourceNotFoundException rnfe) {
-                this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
-                this.contentType = "text/html; charset=utf-8";
-                this.content = ChannelBuffers.copiedBuffer(rnfe.toString(), CharsetUtil.UTF_8);
-            } catch (ParseErrorException pee) {
-                this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
-                this.contentType = "text/html; charset=utf-8";
-                this.content = ChannelBuffers.copiedBuffer(pee.toString(), CharsetUtil.UTF_8);
-            } catch (MethodInvocationException mie) {
-                this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
-                this.contentType = "text/html; charset=utf-8";
-                this.content = ChannelBuffers.copiedBuffer(mie.toString(), CharsetUtil.UTF_8);
-            } catch (Exception e) {
-                this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
-                this.contentType = "text/html; charset=utf-8";
-                this.content = ChannelBuffers.copiedBuffer(e.toString(), CharsetUtil.UTF_8);
+                this.content = ChannelBuffers.copiedBuffer(content, CharsetUtil.UTF_8);
             }
+            // it's a play! file, so let's go parse and render it with velocity ...
+            else {
+                List<TestScenario> tests;
+                tests = TestRunnerUtils.parseTestFile(testFile);
 
+                // initialize velocity
+                Properties props = new Properties();
+                props.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+                props.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                        "org.apache.velocity.runtime.log.Log4JLogChute");
+                props.setProperty("runtime.log.logsystem.log4j.logger", "VELOCITY");
+                props.setProperty("classpath." + VelocityEngine.RESOURCE_LOADER + ".class",
+                        ClasspathResourceLoader.class.getName());
+
+                Velocity.init(props);
+                VelocityContext context = new VelocityContext();
+                // put parameter for template
+                context.put("tests", tests);
+
+                // get the template
+                Template template = null;
+                try {
+                    template = Velocity.getTemplate("com/logisima/selenium/template/test.vm");
+                    StringWriter sw = new StringWriter();
+                    template.merge(context, sw);
+                    // create the response
+                    this.contentType = "text/html; charset=utf-8";
+                    this.content = ChannelBuffers.copiedBuffer(sw.toString(), CharsetUtil.UTF_8);
+
+                } catch (ResourceNotFoundException rnfe) {
+                    this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+                    this.contentType = "text/html; charset=utf-8";
+                    this.content = ChannelBuffers.copiedBuffer(rnfe.toString(), CharsetUtil.UTF_8);
+                } catch (ParseErrorException pee) {
+                    this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+                    this.contentType = "text/html; charset=utf-8";
+                    this.content = ChannelBuffers.copiedBuffer(pee.toString(), CharsetUtil.UTF_8);
+                } catch (MethodInvocationException mie) {
+                    this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+                    this.contentType = "text/html; charset=utf-8";
+                    this.content = ChannelBuffers.copiedBuffer(mie.toString(), CharsetUtil.UTF_8);
+                } catch (Exception e) {
+                    this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+                    this.contentType = "text/html; charset=utf-8";
+                    this.content = ChannelBuffers.copiedBuffer(e.toString(), CharsetUtil.UTF_8);
+                }
+            }
             // render template
         } catch (IOException e1) {
             this.status = HttpResponseStatus.INTERNAL_SERVER_ERROR;

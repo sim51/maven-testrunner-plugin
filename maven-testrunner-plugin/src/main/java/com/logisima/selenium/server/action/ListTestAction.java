@@ -53,12 +53,14 @@ public class ListTestAction extends ServerAction {
      * Constructor.
      * 
      * @param request
+     * @param chunksBuf
      * @param baseApplicationUrl
      * @param testSourceDirectory
      * @param outputDirectory
      */
-    public ListTestAction(HttpRequest request, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
-        super(request, baseApplicationUrl, testSourceDirectory, outputDirectory);
+    public ListTestAction(HttpRequest request, StringBuilder chunksBuf, URL baseApplicationUrl,
+            File testSourceDirectory, File outputDirectory) {
+        super(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
     }
 
     @Override
@@ -78,9 +80,9 @@ public class ListTestAction extends ServerAction {
         VelocityContext context = new VelocityContext();
         // put parameter for template
         context.put("tests", scanner.getTests());
-        context.put("baseApplicationUrl", baseApplicationUrl);
+        context.put("baseApplicationUrl", baseApplicationUrl.toString());
         context.put("testSourceDirectory", testSourceDirectory.getPath());
-        context.put("TRUtils", new TestRunnerUtils());
+        context.put("TRUtils", TestRunnerUtils.class);
 
         // get the template
         Template template = null;
