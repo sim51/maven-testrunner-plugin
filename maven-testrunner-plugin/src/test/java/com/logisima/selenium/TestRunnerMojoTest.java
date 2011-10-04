@@ -84,7 +84,7 @@ public class TestRunnerMojoTest extends AbstractMojoTestCase {
         URL url = new URL("http://localhost:7777");
         HtmlPage page = firephoque.getPage(url);
 
-        assertEquals("Maven Selenium testrunner plugin - List", page.getTitleText());
+        assertEquals("Maven Selenium testrunner plugin", page.getTitleText());
 
         firephoque.closeAllWindows();
         mojoThread.interrupt();

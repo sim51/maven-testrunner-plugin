@@ -76,7 +76,7 @@ public class NettyServerTest extends TestCase {
     @Test
     public void testListActionServer() throws MojoExecutionException, FailingHttpStatusCodeException, IOException {
         HtmlPage page = firephoque.getPage(new URL("http://localhost:7777/"));
-        assertEquals("Maven Selenium testrunner plugin - List", page.getTitleText());
+        assertEquals("Maven Selenium testrunner plugin", page.getTitleText());
         assertTrue(page
                 .asXml()
                 .contains(
@@ -89,7 +89,7 @@ public class NettyServerTest extends TestCase {
         URL suiteUrl = new URL("http://localhost:7777"
                 + TestRunnerUtils.getSuiteActionUrl(seleniumScript, projectTestPathFile.getAbsolutePath()));
         HtmlPage page = firephoque.getPage(suiteUrl);
-        assertTrue(page.asText().contains("Maven Selenium testrunner plugin - List"));
+        assertTrue(page.asText().contains("Maven Selenium testrunner plugin"));
         assertTrue(page.asText().contains("resources.selenium.test.html"));
     }
 
