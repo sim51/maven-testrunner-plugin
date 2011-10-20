@@ -1,0 +1,29 @@
+#{selenium 'Forbidden'}
+    open('/example-application/')
+    waitForPageToLoad(600)
+    clickAndWait('//a[text()='Ajouter'] ')
+    assertTitle('Error 403 FORBIDDEN')
+#{/selenium}
+
+#{selenium 'login'}
+    open('/example-application')
+    waitForPageToLoad(600)
+    clickAndWait('link=Editer')
+    type('login_username', 'admin')
+    type('login_password', 'admin')
+    clickAndWait('id=login_btn_connecter')
+#{/selenium}
+
+#{selenium 'edit'}
+    clickAndWait('link=Editer')
+    type('saveUpdateContact_action_prenom', 'Benoît')
+    type('saveUpdateContact_action_nom', 'SIMARD')
+    type('saveUpdateContact_action_telephone', '11 11 11 11 11')
+    clickAndWait('id=saveUpdateContact_action_btn_update')
+    assertTextPresent('11 11 11 11 11)
+#{/selenium}
+
+#{selenium 'delete'}
+    clickAndWait('link=Supprimer')
+    assertTextNotPresent('11 11 11 11 11)
+#{/selenium}

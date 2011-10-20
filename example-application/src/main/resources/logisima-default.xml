@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+    
+<struts>	
+	<package name="logisima-default" namespace="/" extends="struts-default">
+
+        <interceptors>
+
+            <interceptor name="authentication" class="fr.logisima.contact.interceptors.AuthenticationInterceptor"/>
+
+            <interceptor-stack name="user" >
+                <interceptor-ref name="authentication"/>
+                <interceptor-ref name="completeStack"/>
+            </interceptor-stack>
+
+            <interceptor-stack name="guest" >
+                <interceptor-ref name="completeStack"/>
+            </interceptor-stack>
+
+        </interceptors>
+
+        <default-interceptor-ref name="guest"/>
+        
+        <default-action-ref name="listContact"/>
+
+        <global-results>
+            <result name="error">/jsp/error.jsp</result>
+            <result name="login" type="redirectAction">loginForm</result>
+        </global-results>
+
+        <global-exception-mappings>
+            <exception-mapping
+                    result="error"
+                    exception="java.lang.Throwable"/>
+        </global-exception-mappings>
+
+    </package>
+
+</struts>

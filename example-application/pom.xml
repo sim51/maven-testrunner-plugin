@@ -1,0 +1,159 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- ===================== -->
+	<!-- = Parent definition = -->
+	<!-- ===================== -->
+	<parent>
+		<groupId>logisima</groupId>
+		<artifactId>maven-testrunner-plugin-parent</artifactId>
+		<version>1.3-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<!-- ====================== -->
+	<!-- = Project definition = -->
+	<!-- ====================== -->
+	<artifactId>example-application</artifactId>
+	<name>example-application</name>
+	<description>Application for maven selenium plugin example</description>
+
+	<!-- ======================== -->
+	<!-- = Project dependencies = -->
+	<!-- ======================== -->
+	<dependencies>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.struts</groupId>
+			<artifactId>struts2-core</artifactId>
+			<version>2.1.8</version>
+		</dependency>
+	</dependencies>
+
+	<!-- ========= -->
+	<!-- = Build = -->
+	<!-- ========= -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<encoding>ISO-8859-15</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+					<webResources>
+						<ressource>
+							<directory>src/main/webapp</directory>
+						</ressource>
+					</webResources>
+					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>maven-jetty-plugin</artifactId>
+				<version>6.1.26</version>
+				<configuration>
+					<stopPort>9966</stopPort>
+					<stopKey>foo</stopKey>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>logisima</groupId>
+				<artifactId>maven-testrunner-plugin</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<port>7777</port>
+					<baseApplicationUrl>http://localhost:8080/</baseApplicationUrl>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>integration</id>
+			<build>
+				<defaultGoal>verify</defaultGoal>
+				<plugins>
+					<plugin>
+						<groupId>org.mortbay.jetty</groupId>
+						<artifactId>maven-jetty-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>start-jetty</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<scanIntervalSeconds>0</scanIntervalSeconds>
+									<daemon>true</daemon>
+								</configuration>
+							</execution>
+							<execution>
+								<id>stop-jetty</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>logisima</groupId>
+						<artifactId>maven-testrunner-plugin</artifactId>
+						<version>${project.version}</version>
+						<executions>
+							<execution>
+								<id>selenium-test</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>auto-run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

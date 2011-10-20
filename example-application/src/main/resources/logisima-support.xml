@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	
+	<package name="user" extends="logisima-default">
+
+		<action name="loginForm" method="form" class="fr.logisima.contact.struts.actions.user.LoginAction">
+			<result name="input">/jsp/user/login.jsp</result>
+		</action>
+		
+		<action name="login" class="fr.logisima.contact.struts.actions.user.LoginAction">
+			<result name="success" type="redirectAction">listContact.action</result>
+			<result name="input">/jsp/user/login.jsp</result>
+		</action>
+		
+		<action name="logout" class="fr.logisima.contact.struts.actions.user.LogoutAction">
+			<result name="success" type="redirectAction">listContact.action</result>
+		</action>
+		
+	</package>
+
+	<package name="contact" extends="logisima-default">
+
+		<action name="listContact" class="fr.logisima.contact.struts.actions.contact.ContactListAction">
+			<result>/jsp/contact/list.jsp</result>
+			<interceptor-ref name="guest"/>
+		</action>
+		
+		<action name="searchContact" class="fr.logisima.contact.struts.actions.contact.ContactSearchAction">
+			<result>/jsp/contact/search.jsp</result>
+			<interceptor-ref name="guest"/>
+		</action>
+		
+		<action name="createContact" method="form" class="fr.logisima.contact.struts.actions.contact.ContactCreateAction">
+			<result name="input">/jsp/contact/create.jsp</result>
+			<interceptor-ref name="roles">
+		        <param name="allowedRoles">contrib,admin</param>
+		    </interceptor-ref>
+			<interceptor-ref name="user"/>
+		</action>		
+		
+		<action name="saveCreateContact" class="fr.logisima.contact.struts.actions.contact.ContactCreateAction">
+			<result name="input">/jsp/contact/create.jsp</result>
+			<result name="success" type="redirectAction">listContact.action</result>
+			<interceptor-ref name="user"/>
+			<interceptor-ref name="roles">
+		        <param name="allowedRoles">contrib,admin</param>
+		    </interceptor-ref>
+		</action>
+
+		<action name="updateContact" method="form" class="fr.logisima.contact.struts.actions.contact.ContactUpdateAction">
+			<result name="input">/jsp/contact/update.jsp</result>
+			<interceptor-ref name="user"/>
+			<interceptor-ref name="roles">
+		        <param name="allowedRoles">contrib,admin</param>
+		    </interceptor-ref>
+		</action>
+		
+		<action name="saveUpdateContact" class="fr.logisima.contact.struts.actions.contact.ContactUpdateAction">
+			<result name="input">/jsp/contact/update.jsp</result>
+			<result name="success" type="redirectAction">listContact.action</result>
+			<interceptor-ref name="roles">
+		        <param name="allowedRoles">contrib,admin</param>
+		    </interceptor-ref>
+			<interceptor-ref name="user"/>
+		</action>
+		
+		<action name="deleteContact"  class="fr.logisima.contact.struts.actions.contact.ContactDeleteAction">
+			<result name="success" type="redirectAction">listContact.action</result>
+			<interceptor-ref name="user"/>
+			<interceptor-ref name="roles">
+		        <param name="allowedRoles">admin</param>
+		    </interceptor-ref>
+		</action>
+		
+	</package>
+	
+</struts>
