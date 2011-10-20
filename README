@@ -9,7 +9,7 @@ This module is a port of selenium testrunner of playframework. It use the same t
 =============================================
 * this module is headless, so it can be run on a server 
 * this module embeds the testrunner selenium server
-* you can test your selenium script directly on your develoment 's plateforme (no need of a selenium server)
+* you can test your selenium script directly on your develoment 's plateform (no need of a selenium server)
 
 =============================================
 	How to use it ?
@@ -24,15 +24,16 @@ This module is a port of selenium testrunner of playframework. It use the same t
 	<plugin>
 		<groupId>logisima</groupId>
 		<artifactId>maven-testrunner-plugin</artifactId>
-		<version>1.2</version>
+		<version>1.3</version>
 		<configuration>
 			<baseApplicationUrl>http://localhost:8080/monApp</baseApplicationUrl>	
 		</configuration>
 	</plugin>
-Where "http://localhost:8080/monApp&quot; is the url of your application to test. 
+Where "http://localhost:8080/monApp" is the url of your application to test. 
  
 * Create your selenium script using the same syntax as play! (@see http://www.playframework.org/documentation/1.2.3/cheatsheet/tests) :
-    - your selenium script must have name like *.test.html
+    - your selenium script must be into the ./src/test/selenium folder ! (@see plugin configuration)
+    - your selenium script must have name like *.html
 
 * then you can use those two commands :
     - mvn testrunner:run : launch the testrunner server (by default port is 7777), so if you open your browser at http://localhost:7777/ you will see the list of yours selenium script and run it.
@@ -43,7 +44,7 @@ Where "http://localhost:8080/monApp&quot; is the url of your application to test
 ==============================================
 * baseApplicationUrl : the url of the application to test.
 * port : the port of the selenium server that the plugin start (default: 7777)
+* seleniumSourceDirectory : folder where you put yuour selenium script. By default it's ./src/test/selenuim
 
 Moreover, the plugin is base on the following maven variable :
 * ${project.build.directory}
-* ${project.build.testSourceDirectory}

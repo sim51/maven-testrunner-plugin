@@ -219,9 +219,9 @@ public class TestRunnerUtils {
      * @param file
      * @return
      */
-    public static String getTestName(File test, String testSourceDirectory) {
+    public static String getTestName(File test, String seleniumSourceDirectory) {
         String testName = test.getAbsolutePath();
-        testName = testName.substring(testSourceDirectory.length(), testName.length());
+        testName = testName.substring(seleniumSourceDirectory.length(), testName.length());
         testName.replaceFirst(".", "");
         return testName;
     }
@@ -232,9 +232,9 @@ public class TestRunnerUtils {
      * @param file
      * @return
      */
-    public static String getTestDisplayName(File test, String testSourceDirectory) {
+    public static String getTestDisplayName(File test, String seleniumSourceDirectory) {
         String testName = test.getAbsolutePath();
-        testName = testName.substring(testSourceDirectory.length(), testName.length());
+        testName = testName.substring(seleniumSourceDirectory.length(), testName.length());
         testName = testName.replaceAll("/", ".").replaceFirst(".", "");
         return testName;
     }
@@ -245,10 +245,9 @@ public class TestRunnerUtils {
      * @param test
      * @return
      */
-    public static String getTestActionUrl(File test, String testSourceDirectory) {
-        // test?test=$stringUtils.sub($test.path, $testSourceDirectory, '')
+    public static String getTestActionUrl(File test, String seleniumSourceDirectory) {
         String url = "/test";
-        url += getTestName(test, testSourceDirectory);
+        url += getTestName(test, seleniumSourceDirectory);
         return url;
     }
 
@@ -258,10 +257,10 @@ public class TestRunnerUtils {
      * @param test
      * @return
      */
-    public static String getSuiteActionUrl(File test, String testSourceDirectory) {
-        // suite.action%3Ftest%3D$stringUtils.sub($test.path, $testSourceDirectory, '')
+    public static String getSuiteActionUrl(File test, String seleniumSourceDirectory) {
+        // suite.action%3Ftest%3D$stringUtils.sub($test.path, $seleniumSourceDirectory, '')
         String url = "/suite";
-        url += getTestName(test, testSourceDirectory);
+        url += getTestName(test, seleniumSourceDirectory);
         return url;
     }
 
@@ -269,12 +268,12 @@ public class TestRunnerUtils {
      * Method get the url of the result action for a selenium script.
      * 
      * @param test
-     * @param testSourceDirectory
+     * @param seleniumSourceDirectory
      * @return
      */
-    public static String getResultActionUrl(File test, String testSourceDirectory) {
+    public static String getResultActionUrl(File test, String seleniumSourceDirectory) {
         String url = "/testresult";
-        url += getTestName(test, testSourceDirectory);
+        url += getTestName(test, seleniumSourceDirectory);
         return url;
     }
 
@@ -284,17 +283,18 @@ public class TestRunnerUtils {
      * @param test
      * @param port
      * @param baseApplicationUrl
+     * @param seleniumSourceDirectory
      * @return
      * @throws UnsupportedEncodingException
      */
-    public static String getTestrunnerActionUrl(File test, String baseApplicationUrl, String testSourceDirectory)
+    public static String getTestrunnerActionUrl(File test, String baseApplicationUrl, String seleniumSourceDirectory)
             throws UnsupportedEncodingException {
         String url = "/TestRunner.html?baseUrl=";
         url += baseApplicationUrl;
         url += "&auto=true&test=";
-        url += URLEncoder.encode(getSuiteActionUrl(test, testSourceDirectory), "UTF-8");
+        url += URLEncoder.encode(getSuiteActionUrl(test, seleniumSourceDirectory), "UTF-8");
         url += "&resultsUrl=";
-        url += URLEncoder.encode(getResultActionUrl(test, testSourceDirectory), "UTF-8");
+        url += URLEncoder.encode(getResultActionUrl(test, seleniumSourceDirectory), "UTF-8");
         return url;
     }
 
@@ -304,15 +304,31 @@ public class TestRunnerUtils {
      * @param test
      * @param baseApplicationUrl
      * @param port
-     * @param testSourceDirectory
+     * @param seleniumSourceDirectory
      * @return
      * @throws IOException
      */
     public static URL getTestrunnerActionFullUrl(File test, String baseApplicationUrl, int port,
-            String testSourceDirectory) throws IOException {
+            String seleniumSourceDirectory) throws IOException {
         String url = "http://localhost:" + port;
-        url += getTestrunnerActionUrl(test, baseApplicationUrl, testSourceDirectory);
+        url += getTestrunnerActionUrl(test, baseApplicationUrl, seleniumSourceDirectory);
         return new URL(url);
+    }
+
+    /**
+     * Method to get the url for the auto-run test
+     * 
+     * @param test
+     * @param baseApplicationUrl
+     * @param port
+     * @param seleniumSourceDirectory
+     * @returnString
+     * @throws IOException
+     */
+    public static String getAutoTestUrl(File test, String seleniumSourceDirectory) throws IOException {
+        String url = "/runtest";
+        url += getTestName(test, seleniumSourceDirectory);
+        return url;
     }
 
     /**
@@ -346,7 +362,6 @@ public class TestRunnerUtils {
      * Method to khnow if a file is selenium IDE file (true)or a play! one (false).
      * 
      * @param test file to test
-     * @param
      * @return
      * @throws IOException
      */
@@ -363,6 +378,13 @@ public class TestRunnerUtils {
         return Boolean.FALSE;
     }
 
+    /**
+     * Method to retrive the content of a file in a <code>String</code>
+     * 
+     * @param file
+     * @return
+     * @throws IOException
+     */
     public static String getFileContent(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         String content = "";
@@ -371,5 +393,22 @@ public class TestRunnerUtils {
             content += strLine + "\n";
         }
         return content;
+    }
+
+    public static void clearTestResult(File outputDirectory, File testSourceDirectory, String testName) {
+        File resultPassedFile = new File(outputDirectory
+                + "/selenium-result/"
+                + TestRunnerUtils.getTestDisplayName(new File(testSourceDirectory + "/" + testName),
+                        testSourceDirectory.getAbsolutePath()) + ".passed.html");
+        if (resultPassedFile.exists()) {
+            resultPassedFile.delete();
+        }
+        File resultFailedFile = new File(outputDirectory
+                + "/selenium-result/"
+                + TestRunnerUtils.getTestDisplayName(new File(testSourceDirectory + "/" + testName),
+                        testSourceDirectory.getAbsolutePath()) + ".failed.html");
+        if (resultFailedFile.exists()) {
+            resultFailedFile.delete();
+        }
     }
 }

@@ -64,11 +64,11 @@ public class TestRunnerMojo extends AbstractMojo {
     /**
      * The directory of test
      * 
-     * @parameter expression="${project.build.testSourceDirectory}"
+     * @parameter expression="${logisima.seleniumSourceDirectory}" default-value="${project.basedir}/src/test/selenium"
      * @required
      * @readonly
      */
-    private String      testSourceDirectory;
+    private String      seleniumSourceDirectory;
 
     /**
      * Netty serever for testrunner
@@ -87,7 +87,7 @@ public class TestRunnerMojo extends AbstractMojo {
         getLog().debug("Selenium testrunning has been deployed");
 
         // Start the server
-        this.server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl, testSourceDirectory,
+        this.server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl, seleniumSourceDirectory,
                 outputDirectory, 1);
         server.run();
 

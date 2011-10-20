@@ -43,6 +43,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.util.CharsetUtil;
 
 import com.logisima.selenium.server.action.ListTestAction;
+import com.logisima.selenium.server.action.RunTestAction;
 import com.logisima.selenium.server.action.ServerAction;
 import com.logisima.selenium.server.action.StaticAction;
 import com.logisima.selenium.server.action.SuiteAction;
@@ -76,6 +77,11 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
      */
     private File                outputDirectory;
 
+    /**
+     * Port of the server
+     */
+    private Integer             port;
+
     private boolean             readingChunks;
     private final StringBuilder chunksBuf = new StringBuilder();
 
@@ -87,12 +93,14 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
      * @param testSourceDirectory
      * @param outputDirectory
      */
-    public HttpRequestHandler(File documentRoot, URL baseApplicationUrl, File testSourceDirectory, File outputDirectory) {
+    public HttpRequestHandler(File documentRoot, URL baseApplicationUrl, File testSourceDirectory,
+            File outputDirectory, Integer port) {
         super();
         this.documentRoot = documentRoot;
         this.baseApplicationUrl = baseApplicationUrl;
         this.testSourceDirectory = testSourceDirectory;
         this.outputDirectory = outputDirectory;
+        this.port = port;
     }
 
     @Override
@@ -152,8 +160,12 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
         else if (request.getUri().startsWith("/testresult/")) {
             action = new TestResultAction(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory);
         }
+        else if (request.getUri().startsWith("/runtest/")) {
+            action = new RunTestAction(request, chunksBuf, baseApplicationUrl, testSourceDirectory, outputDirectory,
+                    port);
+        }
         else {
-            // It's a static file
+            // Is it a static file
             action = new StaticAction(request, chunksBuf, documentRoot, baseApplicationUrl, testSourceDirectory,
                     outputDirectory);
         }
@@ -189,4 +201,5 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
         e.getCause().printStackTrace();
         e.getChannel().close();
     }
+
 }

@@ -65,7 +65,7 @@
 					<baseApplicationUrl>http://localhost:7777</baseApplicationUrl>
 					<port>7777</port>
 					<outputDirectory>/home/bsimard/workspace_logisima/maven-selenium-testrunner-parent/maven-testrunner-plugin/target</outputDirectory>
-					<testSourceDirectory>/home/bsimard/workspace_logisima/maven-selenium-testrunner-parent/maven-testrunner-plugin/src/test/resources/mojotest</testSourceDirectory>
+					<seleniumSourceDirectory>/home/bsimard/workspace_logisima/maven-selenium-testrunner-parent/maven-testrunner-plugin/src/test/resources/mojotest</seleniumSourceDirectory>
 				</configuration>
 			</plugin>
 		</plugins>

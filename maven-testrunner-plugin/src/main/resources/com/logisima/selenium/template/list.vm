@@ -30,9 +30,10 @@
 				padding: 5px;
 			}
 			#content a {
-				display:block;
-				margin: 0px;
-				padding : 10px 10px 10px 30px;
+				background-color: #C6CFD9;
+				margin: 10px 10px 10px 30px;
+				text-decoration : none;
+				padding: 3px 6px;
 			}
 			a:hover{
 				background: #C6CFD9;
@@ -42,7 +43,10 @@
 				font-size: 12px;
 				text-align:center;
 			}
-			
+			.testresults{
+				margin: 10px 10px 10px 50px;
+				border : 1px solid #919EC0;
+			}
         </style>
     </head>
     <body>
@@ -54,11 +58,16 @@
        		<ul>
        			#foreach( $test in $tests )
 				    <li>
-				    	#set($url = $TRUtils.getTestrunnerActionUrl($test, $baseApplicationUrl, $testSourceDirectory))
+				    	#set($url = $TRUtils.getAutoTestUrl($test, $testSourceDirectory))
 				    	#set($name = $TRUtils.getTestDisplayName($test, $testSourceDirectory)) 
-				    	<a href='$url' target="_blank">
-				    		$name
-				    	</a>
+				    	<div id="$name">
+				    		<a href='$url'>
+				    			$name
+				    		</a>
+				    		<img src="/extra/running.gif" style="display:none"/>
+				    		<div class="testresults" style="display:none">
+				    		</div>
+				    	</div>
 				    </li>
 				#end
 			</ul>
@@ -67,6 +76,35 @@
        	<div id="footer">
        		Author: LogiSima (<a href="http://www.bsimard.com">Beno&icirc;t SIMARD</a>) | Licence : GPL V3 | Source code & tracker are on<a href="https://github.com/sim51/maven-testrunner-plugin"> github</a>
        	</div>
+       	
+       	<script type="text/javascript" src="/extra/jquery-1.6.4.min.js"><!--  --></script>
+       	<script type="text/javascript">
+       		$('a').bind('click', function(e){
+       			e.preventDefault();
+       			var url = $(this).attr('href');
+       			var myLink = $(this);
+       			$(this).next().show();
+       			$(this).parentsUntil("body").find(".testresults").hide();
+				$.ajax({
+					type: 'GET',
+					url: '$url',
+					async: 'false',
+					context : $(this),
+					dataType: 'html',
+					success: function(data){
+						$(this).next().hide();
+	  					$(this).siblings(".testresults").html(data);
+						$(this).siblings(".testresults").show();
+	  				},
+	  				error: function(XMLHttpRequest, textStatus, errorThrown){
+	  					$(this).next().hide();
+	  					$(this).siblings(".testresults").html(errorThrown);
+	  					$(this).siblings(".testresults").show();
+	  				}
+  					
+				})       			
+       		});
+       	</script>
        	
     </body>
 </html>

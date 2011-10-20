@@ -74,6 +74,9 @@ public class TestResultAction extends ServerAction {
             String table = parameters.get("testTable.1");
             String result = parameters.get("result");
 
+            // we clean last run
+            TestRunnerUtils.clearTestResult(outputDirectory, testSourceDirectory, test);
+
             File directoryResult = new File(outputDirectory + "/selenium-result/");
             if (!directoryResult.exists()) {
                 directoryResult.mkdirs();

@@ -28,6 +28,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.logisima.selenium.server.NettyServer;
 import com.logisima.selenium.utils.SeleniumScanner;
@@ -67,11 +68,11 @@ public class AutoTestRunnerMojo extends AbstractMojo {
     /**
      * The directory of test
      * 
-     * @parameter expression="${project.build.testSourceDirectory}"
+     * @parameter expression="${logisima.seleniumSourceDirectory}" default-value="${project.basedir}/src/test/selenium"
      * @required
      * @readonly
      */
-    private String      testSourceDirectory;
+    private String      seleniumSourceDirectory;
 
     /**
      * Netty serever for testrunner
@@ -89,20 +90,20 @@ public class AutoTestRunnerMojo extends AbstractMojo {
         getLog().debug("Selenium testrunning has been deployed");
 
         // Start the server
-        server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl, testSourceDirectory,
+        server = new NettyServer(port, outputDirectory + "/selenium", baseApplicationUrl, seleniumSourceDirectory,
                 outputDirectory, 1);
         server.run();
 
-        // get firephoque
-        WebClient firephoque = TestRunnerUtils.getWebClient();
-
         // get list of selenium test
+        getLog().debug("Scanning " + seleniumSourceDirectory + " for selenium test.");
         SeleniumScanner scanner = new SeleniumScanner();
-        scanner.scanForSeleniumTests(new File(testSourceDirectory));
+        scanner.scanForSeleniumTests(new File(seleniumSourceDirectory));
         List<File> tests = scanner.getTests();
+        getLog().debug("Found " + tests.size() + " tests !");
 
         boolean testsPassed = true;
         String failedTest = "\n";
+        WebClient firephoque = new WebClient(BrowserVersion.INTERNET_EXPLORER_8);
         try {
             // run all selenium test
             getLog().info("Executing " + tests.size() + " tests :");
@@ -110,13 +111,15 @@ public class AutoTestRunnerMojo extends AbstractMojo {
 
                 // the testrunner url to call
                 URL url = TestRunnerUtils.getTestrunnerActionFullUrl(tests.get(i), baseApplicationUrl.toString(), port,
-                        testSourceDirectory);
+                        seleniumSourceDirectory);
 
-                String displayName = TestRunnerUtils.getTestDisplayName(tests.get(i), testSourceDirectory);
+                String displayName = TestRunnerUtils.getTestDisplayName(tests.get(i), seleniumSourceDirectory);
 
                 getLog().debug("Calling " + url.toString());
 
                 // let's do the web call !
+                // get firephoque
+                firephoque = TestRunnerUtils.getWebClient();
                 firephoque.openWindow(url, "headless");
                 firephoque.waitForBackgroundJavaScript(5 * 60 * 1000);
                 int retry = 0;
@@ -148,6 +151,7 @@ public class AutoTestRunnerMojo extends AbstractMojo {
                             Thread.sleep(1000);
                         }
                     }
+                    firephoque.closeAllWindows();
                 }
             }
         } catch (IOException e) {
@@ -155,8 +159,10 @@ public class AutoTestRunnerMojo extends AbstractMojo {
         } catch (InterruptedException e) {
             throw new MojoExecutionException(e.getMessage());
         } finally {
+            getLog().debug("Stopping selenium server.");
             firephoque.closeAllWindows();
             server.interrupt();
+            getLog().debug("Selenium server is stop.");
         }
 
         if (!testsPassed) {

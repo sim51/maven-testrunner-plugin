@@ -65,7 +65,7 @@ public class StaticAction extends ServerAction {
     public void execute() {
         this.setContentType();
         try {
-            if (request.getUri().endsWith(".png")) {
+            if (request.getUri().endsWith(".png") | request.getUri().endsWith(".gif")) {
                 File image = new File(documentRoot.getAbsolutePath() + request.getUri());
                 this.content = ChannelBuffers.copiedBuffer(FileUtils.readFileToByteArray(image));
             }
@@ -110,6 +110,9 @@ public class StaticAction extends ServerAction {
         }
         else if (request.getUri().endsWith(".png")) {
             this.contentType = "image/png; charset=UTF-8";
+        }
+        else if (request.getUri().endsWith(".gif")) {
+            this.contentType = "image/gif; charset=UTF-8";
         }
         else {
             this.contentType = "text/html; charset=UTF-8";

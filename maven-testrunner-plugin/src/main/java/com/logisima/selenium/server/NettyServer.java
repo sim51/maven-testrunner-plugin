@@ -118,7 +118,7 @@ public class NettyServer extends Thread {
 
         // Set up the event pipeline factory.
         this.bootstrap.setPipelineFactory(new HttpServerPipelineFactory(documentRoot, baseApplicationUrl,
-                testSourceDirectory, outputDirectory));
+                testSourceDirectory, outputDirectory, port));
 
         // set options
         bootstrap.setOption("child.tcpNoDelay", true);

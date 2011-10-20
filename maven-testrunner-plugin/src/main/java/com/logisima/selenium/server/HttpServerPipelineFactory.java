@@ -35,22 +35,27 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory {
     /**
      * DocumentRoot of the server
      */
-    private File documentRoot;
+    private File    documentRoot;
 
     /**
      * Url of the applicatoin to test
      */
-    private URL  baseApplicationUrl;
+    private URL     baseApplicationUrl;
 
     /**
      * Maven test directory
      */
-    private File testSourceDirectory;
+    private File    testSourceDirectory;
 
     /**
      * Maven target folder
      */
-    private File outputDirectory;
+    private File    outputDirectory;
+
+    /**
+     * Port of the server
+     */
+    private Integer port;
 
     /**
      * Constructor.
@@ -59,13 +64,15 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory {
      * @param baseApplicationUrl
      * @param testSourceDirectory
      * @param outputDirectory
+     * @param port
      */
     public HttpServerPipelineFactory(File documentRoot, URL baseApplicationUrl, File testSourceDirectory,
-            File outputDirectory) {
+            File outputDirectory, Integer port) {
         this.documentRoot = documentRoot;
         this.baseApplicationUrl = baseApplicationUrl;
         this.testSourceDirectory = testSourceDirectory;
         this.outputDirectory = outputDirectory;
+        this.port = port;
     }
 
     public ChannelPipeline getPipeline() throws Exception {
@@ -76,7 +83,7 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory {
         pipeline.addLast("encoder", new HttpResponseEncoder());
         pipeline.addLast("deflater", new HttpContentCompressor());
         pipeline.addLast("handler", new HttpRequestHandler(documentRoot, baseApplicationUrl, testSourceDirectory,
-                outputDirectory));
+                outputDirectory, port));
 
         return pipeline;
     }

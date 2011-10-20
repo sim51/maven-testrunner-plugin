@@ -52,7 +52,7 @@ public class SeleniumScanner {
             if (f.isDirectory()) {
                 scanForSeleniumTests(f);
             }
-            else if (f.getName().endsWith(".test.html")) {
+            else if (f.getName().endsWith(".html")) {
                 tests.add(f);
             }
         }

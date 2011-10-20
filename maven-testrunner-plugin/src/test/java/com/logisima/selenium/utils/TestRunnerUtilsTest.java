@@ -121,6 +121,16 @@ public class TestRunnerUtilsTest extends TestCase {
     }
 
     @Test
+    public void testGetAutoTestUrl() throws IOException {
+        String testSourceDirectory = "/tmp/project/src/test/java";
+        File test = new File(testSourceDirectory + "/fr/logisima/test/oneTest.test.html");
+
+        String url = TestRunnerUtils.getAutoTestUrl(test, testSourceDirectory);
+        assertEquals("/runtest/fr/logisima/test/oneTest.test.html", url);
+
+    }
+
+    @Test
     public void testWriteContent() throws IOException {
         File file = new File(FileUtils.getTempDirectoryPath() + "/myTest.txt");
         String content = "Some text";
